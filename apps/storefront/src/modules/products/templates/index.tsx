@@ -1,16 +1,14 @@
 import React, { Suspense } from "react"
-
 import ImageGallery from "@modules/products/components/image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
-import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
-
 import ProductActionsWrapper from "./product-actions-wrapper"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -30,20 +28,38 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   }
 
   return (
-    <>
+    <div className="bg-white min-h-screen py-6 sm:py-10">
+      {/* Breadcrumbs */}
+      <div className="content-container mb-6">
+        <div className="flex items-center gap-2 text-xs text-brand-primary/60">
+          <LocalizedClientLink href="/" className="hover:text-brand-primary">
+            Home
+          </LocalizedClientLink>
+          <span>/</span>
+          <LocalizedClientLink href="/store" className="hover:text-brand-primary">
+            Clothing
+          </LocalizedClientLink>
+          <span>/</span>
+          <span className="text-brand-primary font-medium truncate max-w-[200px] sm:max-w-none">
+            {product.title}
+          </span>
+        </div>
+      </div>
+
+      {/* Main 2-Column Product Grid */}
       <div
-        className="content-container  flex flex-col small:flex-row small:items-start py-6 relative"
+        className="content-container grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start"
         data-testid="product-container"
       >
-        <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-6">
-          <ProductInfo product={product} />
-          <ProductTabs product={product} />
-        </div>
-        <div className="block w-full relative">
+        {/* Left Column: Image Gallery (6 cols) */}
+        <div className="lg:col-span-7">
           <ImageGallery images={images} />
         </div>
-        <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-12">
-          <ProductOnboardingCta />
+
+        {/* Right Column: Sticky Product Info & Actions (5 cols) */}
+        <div className="lg:col-span-5 lg:sticky lg:top-32 space-y-6">
+          <ProductInfo product={product} />
+
           <Suspense
             fallback={
               <ProductActions
@@ -55,17 +71,21 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           >
             <ProductActionsWrapper id={product.id} region={region} />
           </Suspense>
+
+          <ProductTabs product={product} />
         </div>
       </div>
+
+      {/* Related Products Section */}
       <div
-        className="content-container my-16 small:my-32"
+        className="content-container mt-20 pt-16 border-t border-brand-border"
         data-testid="related-products-container"
       >
         <Suspense fallback={<SkeletonRelatedProducts />}>
           <RelatedProducts product={product} countryCode={countryCode} />
         </Suspense>
       </div>
-    </>
+    </div>
   )
 }
 

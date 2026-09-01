@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-
+import { constructMetadata } from "@lib/util/seo"
 import ProfilePhone from "@modules/account//components/profile-phone"
 import ProfileBillingAddress from "@modules/account/components/profile-billing-address"
 import ProfileEmail from "@modules/account/components/profile-email"
@@ -8,10 +8,11 @@ import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Profile",
-  description: "View and edit your Medusa Store profile.",
-}
+export const metadata: Metadata = constructMetadata({
+  title: "Profile | London Boy",
+  description: "View and edit your London Boy customer profile.",
+  noIndex: true,
+})
 
 export default async function Profile() {
   const customer = await retrieveCustomer()

@@ -3,10 +3,10 @@
 import { isManual, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@modules/common/components/ui"
+import Spinner from "@modules/common/icons/spinner"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import { useParams } from "next/navigation"
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import ErrorMessage from "../error-message"
 
 type PaymentButtonProps = {
@@ -41,7 +41,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
       )
     default:
-      return <Button disabled>Select a payment method</Button>
+      return (
+        <button
+          disabled
+          className="w-full py-4 bg-brand-border text-brand-muted text-xs font-heading font-semibold uppercase tracking-widest cursor-not-allowed"
+        >
+          Select a payment method
+        </button>
+      )
   }
 }
 
@@ -56,29 +63,32 @@ const StripePaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const isSubmittingRef = useRef(false)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      await placeOrder()
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Failed to place order.")
+      setSubmitting(false)
+      isSubmittingRef.current = false
+    }
   }
 
   const stripe = useStripe()
   const elements = useElements()
   const { countryCode } = useParams()
 
-  const disabled = !stripe || !elements ? true : false
+  const disabled = !stripe || !elements || notReady || submitting
 
   const handlePayment = async () => {
-    if (!stripe || !elements || !cart) {
+    if (!stripe || !elements || !cart || isSubmittingRef.current) {
       return
     }
 
+    isSubmittingRef.current = true
     setSubmitting(true)
+    setErrorMessage(null)
 
     await stripe
       .confirmPayment({
@@ -104,8 +114,6 @@ const StripePaymentButton = ({
             },
           },
         },
-        // Only leave the site when the selected method actually requires it, so
-        // card payments still complete inline.
         redirect: "if_required",
       })
       .then(({ error, paymentIntent }) => {
@@ -120,8 +128,9 @@ const StripePaymentButton = ({
             return
           }
 
-          setErrorMessage(error.message || null)
+          setErrorMessage(error.message || "Stripe authorization failed.")
           setSubmitting(false)
+          isSubmittingRef.current = false
           return
         }
 
@@ -134,64 +143,81 @@ const StripePaymentButton = ({
         }
 
         setSubmitting(false)
+        isSubmittingRef.current = false
+      })
+      .catch((err) => {
+        setErrorMessage(err?.message || "Payment confirmation failed.")
+        setSubmitting(false)
+        isSubmittingRef.current = false
       })
   }
 
   return (
-    <>
-      <Button
-        disabled={disabled || notReady}
+    <div className="space-y-3">
+      <button
+        disabled={disabled}
         onClick={handlePayment}
-        size="large"
-        isLoading={submitting}
         data-testid={dataTestId}
+        className="w-full py-4 bg-brand-primary hover:bg-black text-white text-xs font-heading font-semibold uppercase tracking-widest transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        Place order
-      </Button>
+        {submitting && <Spinner className="animate-spin text-white" />}
+        <span>{submitting ? "Processing Order..." : "Place Order (Stripe)"}</span>
+      </button>
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"
       />
-    </>
+    </div>
   )
 }
 
 const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const isSubmittingRef = useRef(false)
 
-  const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
-  }
+  const handlePayment = async () => {
+    if (isSubmittingRef.current || notReady) {
+      return
+    }
 
-  const handlePayment = () => {
+    isSubmittingRef.current = true
     setSubmitting(true)
+    setErrorMessage(null)
 
-    onPaymentCompleted()
+    try {
+      await placeOrder()
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Error placing order.")
+      setSubmitting(false)
+      isSubmittingRef.current = false
+    }
   }
 
   return (
-    <>
-      <Button
-        disabled={notReady}
-        isLoading={submitting}
+    <div className="space-y-3">
+      <div className="p-3 bg-brand-secondary/80 border border-brand-border text-[11px] text-brand-primary/80">
+        <span className="font-heading font-bold uppercase tracking-wider text-brand-accent block mb-0.5">
+          ⚙️ Development Test Mode
+        </span>
+        This order will be created using Medusa&apos;s development test provider. No real credit card charge will be made.
+      </div>
+
+      <button
+        disabled={notReady || submitting}
         onClick={handlePayment}
-        size="large"
         data-testid="submit-order-button"
+        className="w-full py-4 bg-brand-primary hover:bg-black text-white text-xs font-heading font-semibold uppercase tracking-widest transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        Place order
-      </Button>
+        {submitting && <Spinner className="animate-spin text-white" />}
+        <span>{submitting ? "Confirming Order..." : "Complete Order →"}</span>
+      </button>
+
       <ErrorMessage
         error={errorMessage}
         data-testid="manual-payment-error-message"
       />
-    </>
+    </div>
   )
 }
 

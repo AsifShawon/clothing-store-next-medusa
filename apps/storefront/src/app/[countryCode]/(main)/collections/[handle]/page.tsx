@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 
 import { getCollectionByHandle, listCollections } from "@lib/data/collections"
 import { listRegions } from "@lib/data/regions"
+import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
+import JsonLd from "@modules/common/components/json-ld"
 import { StoreCollection, StoreRegion } from "@medusajs/types"
 import CollectionTemplate from "@modules/collections/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -62,12 +64,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  const metadata = {
-    title: `${collection.title} | Medusa Store`,
-    description: `${collection.title} collection`,
-  } as Metadata
-
-  return metadata
+  return constructMetadata({
+    title: `${collection.title} Collection | London Boy`,
+    description: `Discover the ${collection.title} collection by London Boy. British smart-casual tailoring crafted for Bangladesh.`,
+    canonical: `/${params.countryCode}/collections/${params.handle}`,
+  })
 }
 
 export default async function CollectionPage(props: Props) {
@@ -76,21 +77,31 @@ export default async function CollectionPage(props: Props) {
   const { sortBy, page } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
-  const collection = await getCollectionByHandle(params.handle).then(
-    (collection) => collection
-  )
+  const collection = await getCollectionByHandle(params.handle)
 
   if (!collection) {
     notFound()
   }
 
+  const breadcrumbsSchema = getBreadcrumbSchema([
+    { name: "Home", url: `/${params.countryCode}` },
+    { name: "Collections", url: `/${params.countryCode}/store` },
+    {
+      name: collection.title,
+      url: `/${params.countryCode}/collections/${collection.handle}`,
+    },
+  ])
+
   return (
-    <CollectionTemplate
-      collection={collection}
-      page={page}
-      sortBy={sortBy}
-      countryCode={params.countryCode}
-      optionValueIds={optionValueIds}
-    />
+    <>
+      <JsonLd data={breadcrumbsSchema} />
+      <CollectionTemplate
+        collection={collection}
+        page={page}
+        sortBy={sortBy}
+        countryCode={params.countryCode}
+        optionValueIds={optionValueIds}
+      />
+    </>
   )
 }

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
+import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
+import JsonLd from "@modules/common/components/json-ld"
 import { HttpTypes, StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -51,17 +53,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Medusa Store"
+    const title = `${productCategory.name} | London Boy`
+    const description =
+      productCategory.description ??
+      `Shop London Boy ${productCategory.name}. Premium British smart-casual clothing crafted for Bangladesh.`
 
-    const description = productCategory.description ?? `${title} category.`
-
-    return {
-      title: `${title} | Medusa Store`,
+    return constructMetadata({
+      title,
       description,
-      alternates: {
-        canonical: `${params.category.join("/")}`,
-      },
-    }
+      canonical: `/${params.countryCode}/categories/${params.category.join("/")}`,
+    })
   } catch {
     notFound()
   }
@@ -79,13 +80,25 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
+  const breadcrumbsSchema = getBreadcrumbSchema([
+    { name: "Home", url: `/${params.countryCode}` },
+    { name: "Categories", url: `/${params.countryCode}/store` },
+    {
+      name: productCategory.name,
+      url: `/${params.countryCode}/categories/${params.category.join("/")}`,
+    },
+  ])
+
   return (
-    <CategoryTemplate
-      category={productCategory}
-      sortBy={sortBy}
-      page={page}
-      countryCode={params.countryCode}
-      optionValueIds={optionValueIds}
-    />
+    <>
+      <JsonLd data={breadcrumbsSchema} />
+      <CategoryTemplate
+        category={productCategory}
+        sortBy={sortBy}
+        page={page}
+        countryCode={params.countryCode}
+        optionValueIds={optionValueIds}
+      />
+    </>
   )
 }

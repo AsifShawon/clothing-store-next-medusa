@@ -1,15 +1,15 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-
+import { constructMetadata } from "@lib/util/seo"
 import AddressBook from "@modules/account/components/address-book"
-
 import { getRegion } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Addresses",
-  description: "View your addresses",
-}
+export const metadata: Metadata = constructMetadata({
+  title: "Shipping Addresses | London Boy",
+  description: "View and update your London Boy delivery addresses.",
+  noIndex: true,
+})
 
 export default async function Addresses(props: {
   params: Promise<{ countryCode: string }>

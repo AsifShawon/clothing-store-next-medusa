@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
+import { constructMetadata, getBreadcrumbSchema, getProductSchema } from "@lib/util/seo"
+import JsonLd from "@modules/common/components/json-ld"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 
@@ -71,15 +73,15 @@ function getImagesForVariant(
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const { handle } = params
-  const region = await getRegion(params.countryCode)
+  const { handle, countryCode } = params
+  const region = await getRegion(countryCode)
 
   if (!region) {
     notFound()
   }
 
   const product = await listProducts({
-    countryCode: params.countryCode,
+    countryCode,
     queryParams: { handle },
   }).then(({ response }) => response.products[0])
 
@@ -87,15 +89,20 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  return {
-    title: `${product.title} | Medusa Store`,
-    description: `${product.title}`,
-    openGraph: {
-      title: `${product.title} | Medusa Store`,
-      description: `${product.title}`,
-      images: product.thumbnail ? [product.thumbnail] : [],
-    },
-  }
+  const title = `${product.title} | London Boy`
+  const description =
+    product.description ||
+    product.subtitle ||
+    `${product.title} - British smart-casual tailoring crafted with premium high-density fabrics for Bangladesh.`
+
+  const imageUrl = product.thumbnail || product.images?.[0]?.url
+
+  return constructMetadata({
+    title,
+    description,
+    image: imageUrl,
+    canonical: `/${countryCode}/products/${handle}`,
+  })
 }
 
 export default async function ProductPage(props: Props) {
@@ -120,12 +127,30 @@ export default async function ProductPage(props: Props) {
 
   const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
+  const productSchema = getProductSchema({
+    product: pricedProduct,
+    region,
+    countryCode: params.countryCode,
+  })
+
+  const breadcrumbsSchema = getBreadcrumbSchema([
+    { name: "Home", url: `/${params.countryCode}` },
+    { name: "Clothing", url: `/${params.countryCode}/store` },
+    {
+      name: pricedProduct.title,
+      url: `/${params.countryCode}/products/${pricedProduct.handle}`,
+    },
+  ])
+
   return (
-    <ProductTemplate
-      product={pricedProduct}
-      region={region}
-      countryCode={params.countryCode}
-      images={images ?? []}
-    />
+    <>
+      <JsonLd data={[productSchema, breadcrumbsSchema]} />
+      <ProductTemplate
+        product={pricedProduct}
+        region={region}
+        countryCode={params.countryCode}
+        images={images ?? []}
+      />
+    </>
   )
 }

@@ -1,6 +1,14 @@
 import { acceptTransferRequest } from "@lib/data/orders"
+import { constructMetadata } from "@lib/util/seo"
 import { Heading, Text } from "@modules/common/components/ui"
 import TransferImage from "@modules/order/components/transfer-image"
+import { Metadata } from "next"
+
+export const metadata: Metadata = constructMetadata({
+  title: "Order Transfer Accepted | London Boy",
+  description: "Order transfer confirmation.",
+  noIndex: true,
+})
 
 export default async function TransferPage({
   params,

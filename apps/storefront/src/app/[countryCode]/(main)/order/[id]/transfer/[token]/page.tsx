@@ -1,6 +1,14 @@
+import { constructMetadata } from "@lib/util/seo"
 import { Heading, Text } from "@modules/common/components/ui"
 import TransferActions from "@modules/order/components/transfer-actions"
 import TransferImage from "@modules/order/components/transfer-image"
+import { Metadata } from "next"
+
+export const metadata: Metadata = constructMetadata({
+  title: "Order Transfer Request | London Boy",
+  description: "Approve or decline order transfer request.",
+  noIndex: true,
+})
 
 export default async function TransferPage({
   params,

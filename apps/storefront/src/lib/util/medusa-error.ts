@@ -1,33 +1,51 @@
-type MedusaError = {
+type MedusaErrorLike = {
   response?: {
-    data: { message?: string } | string
-    status: number
-    headers: unknown
+    data?: { message?: string; error?: string; type?: string } | string
+    status?: number
+    headers?: unknown
   }
   request?: unknown
   message?: string
-  config?: { url: string; baseURL: string }
+  statusText?: string
+  config?: { url?: string; baseURL?: string }
 }
 
 export default function medusaError(error: unknown): never {
-  const err = error as MedusaError
-  if (err.response) {
-    const u = new URL(err.config?.url ?? "", err.config?.baseURL ?? "")
-    console.error("Resource:", u.toString())
-    console.error("Response data:", err.response.data)
-    console.error("Status code:", err.response.status)
-    console.error("Headers:", err.response.headers)
-
-    const data = err.response.data
-    const message =
-      typeof data === "object" && data !== null
-        ? data.message || String(data)
-        : data
-
-    throw new Error(message.charAt(0).toUpperCase() + message.slice(1) + ".")
-  } else if (err.request) {
-    throw new Error("No response received: " + String(err.request))
-  } else {
-    throw new Error("Error setting up the request: " + err.message)
+  if (typeof error === "string") {
+    throw new Error(error)
   }
+
+  const err = error as MedusaErrorLike
+
+  if (err?.response?.data) {
+    const data = err.response.data
+    let message = ""
+
+    if (typeof data === "object" && data !== null) {
+      message = data.message || data.error || JSON.stringify(data)
+    } else if (typeof data === "string") {
+      message = data
+    }
+
+    if (message) {
+      const formatted = message.charAt(0).toUpperCase() + message.slice(1)
+      throw new Error(formatted.endsWith(".") ? formatted : `${formatted}.`)
+    }
+  }
+
+  if (err?.message) {
+    // If the error message starts with JSON or FetchError, clean it up
+    let message = err.message
+    if (message.includes("is not valid") || message.includes("not found")) {
+      message = message.replace(/^Error:\s*/, "")
+    }
+    const formatted = message.charAt(0).toUpperCase() + message.slice(1)
+    throw new Error(formatted.endsWith(".") ? formatted : `${formatted}.`)
+  }
+
+  if (err?.request) {
+    throw new Error("No response received from Medusa server. Please check your connection.")
+  }
+
+  throw new Error("An unexpected error occurred while processing your request.")
 }

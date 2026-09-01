@@ -24,7 +24,7 @@ import { getLocale } from "./locale-actions"
 export async function retrieveCart(cartId?: string, fields?: string) {
   const id = cartId || (await getCartId())
   fields ??=
-    "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
+    "*items, *region, *items.product, *items.variant, *items.variant.options, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
 
   if (!id) {
     return null
@@ -278,11 +278,11 @@ export async function applyPromotions(codes: string[]) {
     .catch(medusaError)
 }
 
-export async function applyGiftCard(code: string) {
+export async function applyGiftCard(_code: string) {
   //   const cartId = getCartId()
   //   if (!cartId) return "No cartId cookie found"
   //   try {
-  //     await updateCart(cartId, { gift_cards: [{ code }] }).then(() => {
+  //     await updateCart(cartId, { gift_cards: [{ code: _code }] }).then(() => {
   //       revalidateTag("cart")
   //     })
   //   } catch (error: any) {
@@ -290,11 +290,11 @@ export async function applyGiftCard(code: string) {
   //   }
 }
 
-export async function removeDiscount(code: string) {
+export async function removeDiscount(_code: string) {
   // const cartId = getCartId()
   // if (!cartId) return "No cartId cookie found"
   // try {
-  //   await deleteDiscount(cartId, code)
+  //   await deleteDiscount(cartId, _code)
   //   revalidateTag("cart")
   // } catch (error: any) {
   //   throw error
@@ -302,8 +302,8 @@ export async function removeDiscount(code: string) {
 }
 
 export async function removeGiftCard(
-  codeToRemove: string,
-  giftCards: any[]
+  _codeToRemove: string,
+  _giftCards: unknown[]
   // giftCards: GiftCard[]
 ) {
   //   const cartId = getCartId()
@@ -328,8 +328,8 @@ export async function submitPromotionForm(
   const code = formData.get("code") as string
   try {
     await applyPromotions([code])
-  } catch (e: any) {
-    return e.message
+  } catch (e: unknown) {
+    return e instanceof Error ? e.message : "Error applying promotion"
   }
 }
 
@@ -344,24 +344,26 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
       throw new Error("No existing cart found when setting addresses")
     }
 
-    const data = {
-      shipping_address: {
-        first_name: formData.get("shipping_address.first_name"),
-        last_name: formData.get("shipping_address.last_name"),
-        address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
-        company: formData.get("shipping_address.company"),
-        postal_code: formData.get("shipping_address.postal_code"),
-        city: formData.get("shipping_address.city"),
-        country_code: formData.get("shipping_address.country_code"),
-        province: formData.get("shipping_address.province"),
-        phone: formData.get("shipping_address.phone"),
-      },
+    const shippingAddress: Record<string, unknown> = {
+      first_name: formData.get("shipping_address.first_name"),
+      last_name: formData.get("shipping_address.last_name"),
+      address_1: formData.get("shipping_address.address_1"),
+      address_2: "",
+      company: formData.get("shipping_address.company"),
+      postal_code: formData.get("shipping_address.postal_code"),
+      city: formData.get("shipping_address.city"),
+      country_code: formData.get("shipping_address.country_code"),
+      province: formData.get("shipping_address.province"),
+      phone: formData.get("shipping_address.phone"),
+    }
+
+    const data: Record<string, unknown> = {
+      shipping_address: shippingAddress,
       email: formData.get("email"),
-    } as any
+    }
 
     const sameAsBilling = formData.get("same_as_billing")
-    if (sameAsBilling === "on") data.billing_address = data.shipping_address
+    if (sameAsBilling === "on") data.billing_address = shippingAddress
 
     if (sameAsBilling !== "on")
       data.billing_address = {
@@ -377,8 +379,8 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         phone: formData.get("billing_address.phone"),
       }
     await updateCart(data)
-  } catch (e: any) {
-    return e.message
+  } catch (e: unknown) {
+    return e instanceof Error ? e.message : "Error setting address"
   }
 
   redirect(
@@ -418,7 +420,7 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
 
-    removeCartId()
+    await removeCartId()
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 

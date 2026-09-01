@@ -1,0 +1,44 @@
+STORE_NAME="London Boy"
+DOMAIN="londonboy.uk"
+API_DOMAIN="api.londonboy.uk"
+
+COUNTRY="bd"
+COUNTRY_NAME="Bangladesh"
+CURRENCY="bdt"
+SELLING_COUNTRIES='["bd"]'
+DEFAULT_LANGUAGE="en"
+
+SUPPORT_EMAIL="londonboy@mack.com.bd"
+EMAIL_FROM="London Boy <orders@send.londonboy.uk>"
+EMAIL_REPLY_TO="londonboy@mack.com.bd"
+
+RETURN_PERIOD_DAYS=1
+RETURN_POLICY_LABEL="Return request within 24 hours of delivery"
+
+PRIMARY_COLOR="#111111"
+SECONDARY_COLOR="#F5F1E8"
+ACCENT_COLOR="#1E4937"
+ALTERNATE_ACCENT_COLOR="#7A2E3A"
+MUTED_COLOR="#CFC4B5"
+SURFACE_COLOR="#FFFFFF"
+
+DISPLAY_FONT="DM Serif Display"
+HEADING_FONT="Manrope"
+BODY_FONT="Inter"
+FONT_PREFERENCE="DM Serif Display (editorial display); Manrope (headings and navigation); Inter (body, forms and UI)"
+
+PRODUCT_CATEGORIES='["T-Shirts","Shirts","Polo Shirts","Shorts","Trousers","Socks","Accessories"]'
+PRODUCT_COLLECTIONS='["New Arrivals","Best Sellers","Essentials"]'
+ACCESSORY_TYPES='["Caps","Belts","Wallets"]'
+
+SHIPPING_PRICES='{"inside_dhaka":60,"dhaka_suburban":100,"outside_dhaka":130}'
+SHIPPING_CURRENCY="bdt"
+SHIPPING_BASE_WEIGHT_KG=1
+
+PAYMENT_PROVIDER="SSLCOMMERZ_SANDBOX"
+COD_ENABLED=true
+EMAIL_PROVIDER="Resend"
+OBJECT_STORAGE_PROVIDER="Cloudflare_R2"
+
+TARGET_CUSTOMER="Men aged 18-35 in Bangladesh seeking modern smart-casual clothing"
+BRAND_TONE="Modern British-inspired, confident, minimal and premium-accessible"

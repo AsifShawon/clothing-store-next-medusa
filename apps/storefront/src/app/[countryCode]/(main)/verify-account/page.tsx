@@ -1,12 +1,13 @@
 import { Metadata } from "next"
 import { Suspense } from "react"
-
+import { constructMetadata } from "@lib/util/seo"
 import VerifyAccount from "@modules/account/components/verify-account"
 
-export const metadata: Metadata = {
-  title: "Verify your email",
+export const metadata: Metadata = constructMetadata({
+  title: "Verify Your Email | London Boy",
   description: "Verify your email address to complete your registration.",
-}
+  noIndex: true,
+})
 
 export default function VerifyAccountPage() {
   return (

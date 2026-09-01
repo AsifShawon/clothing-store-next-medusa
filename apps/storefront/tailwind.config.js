@@ -20,6 +20,16 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        brand: {
+          primary: "#111111",
+          secondary: "#F5F1E8",
+          accent: "#1E4937",
+          "accent-alt": "#7A2E3A",
+          muted: "#CFC4B5",
+          surface: "#FFFFFF",
+          card: "#FAFAF7",
+          border: "#E7E2D8",
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -58,14 +68,16 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
+        display: ["var(--font-dm-serif)", "Georgia", "serif"],
+        heading: ["var(--font-manrope)", "sans-serif"],
         sans: [
+          "var(--font-inter)",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
           "Roboto",
           "Helvetica Neue",
-          "Ubuntu",
           "sans-serif",
         ],
       },

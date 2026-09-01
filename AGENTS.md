@@ -4,6 +4,19 @@
 
 Medusa DTC Starter — a Turborepo workspace monorepo containing a Medusa backend (`@medusajs/medusa` latest, Node 20+, PostgreSQL 15+) and an optional storefront (Next.js, Tanstack, etc...).
 
+## Project Scope & Architectural Guardrails
+
+This project is strictly a **production-ready, single-brand direct-to-consumer clothing e-commerce website**. The following technologies and concepts are strictly **out of scope**:
+- SaaS and multi-tenancy models
+- Marketplace vendors and multi-vendor logic
+- Custom admin dashboard (use built-in Medusa Admin at `/app`)
+- NestJS or competing backend frameworks
+- Custom AI agents, LLM product generation, or pgvector
+- Meilisearch, Elasticsearch, or Algolia integrations
+- Subscriptions and recurring billing
+- Visual page-builder or CMS plugins
+
+
 ## Directory Structure
 
 ```text

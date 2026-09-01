@@ -1,6 +1,5 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
-import MedusaCTA from "@modules/layout/components/medusa-cta"
 
 export default function CheckoutLayout({
   children,
@@ -26,18 +25,24 @@ export default function CheckoutLayout({
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
+            className="font-display text-xl tracking-[0.18em] text-brand-primary font-bold hover:opacity-90"
             data-testid="store-link"
           >
-            Medusa Store
+            LONDON BOY
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>
       </div>
-      <div className="relative" data-testid="checkout-container">{children}</div>
-      <div className="py-4 w-full flex items-center justify-center">
-        <MedusaCTA />
-      </div>
+      <main id="main-content" className="relative flex-1" data-testid="checkout-container">
+        {children}
+      </main>
+      <footer className="py-6 w-full flex items-center justify-center border-t border-brand-border/40 text-xs text-brand-primary/60">
+        <div className="flex items-center gap-2">
+          <span>🔒 256-Bit SSL Encrypted Checkout</span>
+          <span>•</span>
+          <span>London Boy Dhaka Fulfillment</span>
+        </div>
+      </footer>
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import { HttpTypes } from "@medusajs/types"
-import { Container } from "@modules/common/components/ui"
 import Image from "next/image"
 
 type ImageGalleryProps = {
@@ -7,33 +6,38 @@ type ImageGalleryProps = {
 }
 
 const ImageGallery = ({ images }: ImageGalleryProps) => {
-  return (
-    <div className="flex items-start relative">
-      <div className="flex flex-col flex-1 small:mx-16 gap-y-4">
-        {images.map((image, index) => {
-          return (
-            <Container
-              key={image.id}
-              className="relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle"
-              id={image.id}
-            >
-              {!!image.url && (
-                <Image
-                  src={image.url}
-                  priority={index <= 2 ? true : false}
-                  className="absolute inset-0 rounded-rounded"
-                  alt={`Product image ${index + 1}`}
-                  fill
-                  sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
-                  style={{
-                    objectFit: "cover",
-                  }}
-                />
-              )}
-            </Container>
-          )
-        })}
+  if (!images || images.length === 0) {
+    return (
+      <div className="relative aspect-[3/4] w-full bg-brand-secondary flex items-center justify-center border border-brand-border">
+        <span className="text-xs font-semibold text-brand-muted uppercase tracking-widest">
+          London Boy Image
+        </span>
       </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      {images.map((image, index) => {
+        return (
+          <div
+            key={image.id || index}
+            className="relative aspect-[3/4] w-full overflow-hidden bg-brand-secondary border border-brand-border"
+            id={image.id}
+          >
+            {!!image.url && (
+              <Image
+                src={image.url}
+                priority={index === 0}
+                className="object-cover object-center w-full h-full hover:scale-102 transition-transform duration-500"
+                alt={`Product visual ${index + 1}`}
+                fill
+                sizes="(max-width: 576px) 100vw, (max-width: 1024px) 50vw, 600px"
+              />
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

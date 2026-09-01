@@ -1,4 +1,5 @@
 import { retrieveOrder } from "@lib/data/orders"
+import { constructMetadata } from "@lib/util/seo"
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -15,10 +16,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  return {
-    title: `Order #${order.display_id}`,
-    description: `View your order`,
-  }
+  return constructMetadata({
+    title: `Order #${order.display_id} | London Boy`,
+    description: `View details and tracking for London Boy order #${order.display_id}.`,
+    noIndex: true,
+  })
 }
 
 export default async function OrderDetailPage(props: Props) {

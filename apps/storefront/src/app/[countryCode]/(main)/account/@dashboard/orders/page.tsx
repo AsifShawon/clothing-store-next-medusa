@@ -1,15 +1,16 @@
 import { Metadata } from "next"
-
+import { constructMetadata } from "@lib/util/seo"
 import OrderOverview from "@modules/account/components/order-overview"
 import { notFound } from "next/navigation"
 import { listOrders } from "@lib/data/orders"
 import Divider from "@modules/common/components/divider"
 import TransferRequestForm from "@modules/account/components/transfer-request-form"
 
-export const metadata: Metadata = {
-  title: "Orders",
-  description: "Overview of your previous orders.",
-}
+export const metadata: Metadata = constructMetadata({
+  title: "Orders | London Boy",
+  description: "Overview of your previous London Boy orders.",
+  noIndex: true,
+})
 
 export default async function Orders() {
   const orders = await listOrders()

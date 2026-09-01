@@ -379,3 +379,42 @@ export const updateCustomerAddress = async (
       return { success: false, error: err.toString() }
     })
 }
+
+export async function requestPasswordReset(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await sdk.auth.resetPassword("customer", "emailpass", {
+      identifier: email,
+    })
+    return { success: true }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to request password reset.",
+    }
+  }
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    await sdk.auth.updateProvider(
+      "customer",
+      "emailpass",
+      {
+        password: newPassword,
+      },
+      token
+    )
+    return { success: true }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to reset password.",
+    }
+  }
+}
+

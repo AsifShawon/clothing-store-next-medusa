@@ -1,4 +1,3 @@
-import { Text, clx } from "@modules/common/components/ui"
 import { VariantPrice } from "types/global"
 
 export default async function PreviewPrice({ price }: { price: VariantPrice }) {
@@ -7,23 +6,23 @@ export default async function PreviewPrice({ price }: { price: VariantPrice }) {
   }
 
   return (
-    <>
+    <div className="flex items-baseline gap-2">
       {price.price_type === "sale" && (
-        <Text
-          className="line-through text-ui-fg-muted"
+        <span
+          className="line-through text-xs text-brand-primary/40"
           data-testid="original-price"
         >
           {price.original_price}
-        </Text>
+        </span>
       )}
-      <Text
-        className={clx("text-ui-fg-muted", {
-          "text-ui-fg-interactive": price.price_type === "sale",
-        })}
+      <span
+        className={`text-sm font-bold font-sans ${
+          price.price_type === "sale" ? "text-brand-accent-alt" : "text-brand-primary"
+        }`}
         data-testid="price"
       >
         {price.calculated_price}
-      </Text>
-    </>
+      </span>
+    </div>
   )
 }
