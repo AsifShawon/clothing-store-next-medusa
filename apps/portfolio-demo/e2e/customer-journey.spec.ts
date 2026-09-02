@@ -8,12 +8,11 @@ test.describe("London Boy Customer Storefront & Checkout Journey", () => {
 
     // Check brand header and hero
     await expect(page.locator("text=LONDON BOY").first()).toBeVisible()
-    await expect(page.locator("text=Tailored for the Modern Standard.").first()).toBeVisible()
+    await expect(page.locator("text=Structured Minimalism").first()).toBeVisible()
 
-    // Check department categories
-    await expect(page.locator("h2:has-text('New Arrivals')").first()).toBeVisible()
-    await expect(page.locator("h3:has-text('Men')").first()).toBeVisible()
-    await expect(page.locator("h3:has-text('Women')").first()).toBeVisible()
+    // Check department categories & featured rails
+    await expect(page.locator("text=Shop By Wardrobe Category").first()).toBeVisible()
+    await expect(page.locator("text=Featured Garments").first()).toBeVisible()
 
     // Check product cards
     await expect(page.locator("text=London Boy Signature Heavyweight T-Shirt").first()).toBeVisible()
@@ -21,6 +20,7 @@ test.describe("London Boy Customer Storefront & Checkout Journey", () => {
 
     assertCleanDiagnostics(diagnostics)
   })
+
 
   test("2. Shop page displays products, search and filters work", async ({ page }) => {
     const diagnostics = attachDiagnostics(page)

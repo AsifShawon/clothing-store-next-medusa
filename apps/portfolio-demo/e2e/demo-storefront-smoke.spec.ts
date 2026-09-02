@@ -7,7 +7,7 @@ const VIEWPORTS = [
   { name: "Desktop (1440x1000)", width: 1440, height: 1000, isMobile: false },
 ]
 
-test.describe("Storefront Visual & Responsive Parity Across Breakpoints", () => {
+test.describe("Portfolio Demo Storefront Responsive Smoke Suite", () => {
   for (const vp of VIEWPORTS) {
     test.describe(`${vp.name}`, () => {
       test.use({ viewport: { width: vp.width, height: vp.height } })
@@ -20,14 +20,14 @@ test.describe("Storefront Visual & Responsive Parity Across Breakpoints", () => 
         await expect(page.locator("text=LONDON BOY").first()).toBeVisible()
 
         // Hero title & CTA
-        await expect(page.locator("text=Tailored for the Modern Standard.").first()).toBeVisible()
+        await expect(page.locator("text=Structured Minimalism").first()).toBeVisible()
 
         // Department / Category sections
-        await expect(page.locator("text=Explore The Collections").first()).toBeVisible()
+        await expect(page.locator("text=Shop By Wardrobe Category").first()).toBeVisible()
 
         // Footer links
         await expect(page.locator("footer").first()).toBeVisible()
-        await expect(page.locator("footer text=Craftsmanship & Sizing").first()).toBeVisible()
+        await expect(page.locator("footer a[href*='/about']").first()).toBeVisible()
 
         assertCleanDiagnostics(diagnostics)
       })
@@ -48,7 +48,7 @@ test.describe("Storefront Visual & Responsive Parity Across Breakpoints", () => 
 
       test("Product detail view renders gallery, variant options, and CTAs", async ({ page }) => {
         const diagnostics = attachDiagnostics(page)
-        await page.goto("/product?handle=london-boy-signature-heavyweight-t-shirt")
+        await page.goto("/product?handle=heavyweight-t-shirt")
 
         // Product title & pricing
         await expect(page.locator("h1").first()).toBeVisible()
@@ -66,11 +66,13 @@ test.describe("Storefront Visual & Responsive Parity Across Breakpoints", () => 
 
         // About view
         await page.goto("/about")
-        await expect(page.locator("text=The Atelier & The Standard").first()).toBeVisible()
+        await expect(page.locator("text=Born in London. Tailored for Bangladesh.").first()).toBeVisible()
 
         // Contact view
         await page.goto("/contact")
-        await expect(page.locator("text=Direct Client Care").first()).toBeVisible()
+        await expect(page.locator("text=Get in Touch with London Boy").first()).toBeVisible()
+
+
 
         // FAQ view
         await page.goto("/faq")
