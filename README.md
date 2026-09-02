@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
-  <a href="https://asifshawon.github.io/clothing-store-next-medusa/"><img src="https://img.shields.io/badge/Live%20Storefront-Demo-black?style=for-the-badge&logo=vercel" alt="Live Storefront Demo" /></a>
-  <a href="https://asifshawon.github.io/clothing-store-next-medusa/demo-admin/"><img src="https://img.shields.io/badge/Live%20Demo-Admin%20Dashboard-4F46E5?style=for-the-badge&logo=safari" alt="Live Demo Admin" /></a>
-  <a href="#portfolio-case-study"><img src="https://img.shields.io/badge/Architecture-Case%20Study-059669?style=for-the-badge&logo=readme" alt="Portfolio Case Study" /></a>
+  <a href="#monorepo-architecture-distinction"><img src="https://img.shields.io/badge/Architecture-Dual--Track%20Monorepo-black?style=for-the-badge&logo=turborepo" alt="Dual-Track Monorepo" /></a>
+  <a href="#appsportfolio-demo-vercel--static-hosting-deployment"><img src="https://img.shields.io/badge/Demo%20Hosting-Vercel%20Static-000000?style=for-the-badge&logo=vercel" alt="Vercel Static" /></a>
+  <a href="#future-real-production-deployment-path"><img src="https://img.shields.io/badge/Production%20Stack-Medusa%20v2-7C3AED?style=for-the-badge&logo=medusa" alt="Medusa v2" /></a>
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 ## Quick Jump
 
 - [Project Summary](#project-summary)
-- [Live Interactive Demos](#live-interactive-demos)
+- [Interactive Demonstration & Local Environments](#interactive-demonstration--local-environments)
 - [Safety Disclaimers & Security Model](#safety-disclaimers--security-model)
 - [Monorepo Architecture Distinction](#monorepo-architecture-distinction)
 - [Architecture Diagram](#architecture-diagram)
@@ -34,6 +34,7 @@
 - [60–90 Second Browser Walkthrough](#6090-second-browser-walkthrough)
 - [Technology Stack](#technology-stack)
 - [Local Development Instructions](#local-development-instructions)
+- [apps/portfolio-demo Vercel / Static Hosting Deployment](#appsportfolio-demo-vercel--static-hosting-deployment)
 - [Demo Reset & Storage Management](#demo-reset--storage-management)
 - [Known Limitations](#known-limitations)
 - [Portfolio Case Study](#portfolio-case-study)
@@ -51,15 +52,18 @@ The repository follows a **dual-track monorepo architecture**:
 
 ---
 
-## Live Interactive Demos
+## Interactive Demonstration & Local Environments
 
-Experience the complete application live directly in your browser with zero sign-up required:
+Experience and inspect both sides of the dual-track architecture locally:
 
-| Component | Live Demo Link | Local Dev Port | Purpose |
+| Track / Component | Command | Local Dev Port | Role & Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Storefront Demo** | [Launch Storefront](https://asifshawon.github.io/clothing-store-next-medusa/) | `http://localhost:8080/` | Customer shopping experience, cart, coupon `LONDON10`, checkout, customer orders |
-| **Demo Admin Dashboard** | [Launch Demo Admin](https://asifshawon.github.io/clothing-store-next-medusa/demo-admin/) | `http://localhost:8080/demo-admin/` | Merchant administration: product catalog CRUD, order fulfillment, refund simulation, coupons |
+| **Portfolio Demo Storefront** | `pnpm run demo:dev` | `http://localhost:8080/` | Zero-backend client-side simulated shopping: catalog, cart, coupon `LONDON10`, shared `CheckoutView`, simulated orders |
+| **Demo Admin Dashboard** | `pnpm run demo:dev` | `http://localhost:8080/demo-admin/` | Browser-based merchant administration: product catalog CRUD, order fulfillment, refund simulation, coupon management |
+| **Medusa Production Storefront** | `pnpm run storefront:dev` | `http://localhost:8000/` | Next.js 15 App Router production target consuming `@dtc/storefront-ui` and Medusa v2 APIs |
+| **Medusa Backend & Admin** | `pnpm run backend:dev` | `http://localhost:9000/` | Medusa v2 commerce engine with native admin at `http://localhost:9000/app` |
 | **60–90s Walkthrough Guide** | [View Walkthrough Guide](docs/walkthrough-guide.md) | — | Step-by-step illustrated narrative of the entire customer & admin workflow |
+
 
 ---
 
@@ -113,7 +117,7 @@ flowchart TB
             DemoApp["apps/portfolio-demo (Next.js 15 Static Export)"]
             LocalStorage["Browser HTML5 localStorage Engine (london-boy:portfolio-demo:v1)"]
             DemoAdmin["Simulated Demo Admin (/demo-admin)"]
-            
+
             DemoApp <--> LocalStorage
             DemoApp <--> DemoAdmin
         end
@@ -332,12 +336,35 @@ pnpm dev
 
 ---
 
+## apps/portfolio-demo Vercel / Static Hosting Deployment
+
+The demonstration app (`apps/portfolio-demo`) is built as a pure client-side Next.js 15 static export (`output: "export"`). It requires zero server runtimes, zero databases, and zero API endpoints, making it ideal for hosting on **Vercel**, **Cloudflare Pages**, or **GitHub Pages**.
+
+### Vercel Monorepo Configuration:
+When importing this Turborepo workspace into Vercel, set the project settings as follows:
+
+| Setting | Value | Rationale |
+| :--- | :--- | :--- |
+| **Root Directory** | `apps/portfolio-demo` | Scopes deployment to the static demo package |
+| **Framework Preset** | `Next.js` | Automatically applies Next.js optimization and caching |
+| **Build Command** | `pnpm run build` *(or `turbo run build --filter=@dtc/portfolio-demo`)* | Builds static HTML/CSS/JS export into `out/` |
+| **Output Directory** | `out` | Next.js 15 static HTML export destination |
+| **Install Command** | `pnpm install` | Uses pnpm 10.11.1 frozen lockfile from workspace root |
+| **Node.js Version** | `20.x` | Monorepo standard runtime |
+
+### Production Pairing:
+- **`apps/storefront`** is the real-world production storefront target that pairs with **`apps/backend`** (Medusa v2 engine with PostgreSQL 16 & Redis 7).
+- **`apps/portfolio-demo`** is strictly the standalone zero-maintenance demonstration surface.
+
+---
+
 ## Demo Reset & Storage Management
+
 
 The portfolio demonstration employs an isolated storage repository (`StorageRepository`) with built-in self-healing and versioning:
 
 1. **State Key**: All custom state is keyed under `london-boy:portfolio-demo:v1`.
-2. **One-Click UI Reset**: 
+2. **One-Click UI Reset**:
    - Navigate to `/demo-admin/settings/` and click **"Reset Demo Data"** (or click the permanent header reset trigger).
    - Enter confirmation to instantly flush custom orders and restore the default 6 garments and 38 variants.
 3. **Manual Browser DevTools Reset**:

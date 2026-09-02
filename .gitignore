@@ -58,4 +58,6 @@ Thumbs.db
 *.tsbuildinfo
 **/test-results/
 **/test-results.json
-**/.last-run.json
+**/.last-run.json
+
+**/playwright-report/
