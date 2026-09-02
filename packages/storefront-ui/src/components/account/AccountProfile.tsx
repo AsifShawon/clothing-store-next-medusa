@@ -7,6 +7,7 @@ import { Button } from "../ui/button"
 
 export interface AccountProfileProps {
   customer: CustomerView
+  isEmailReadOnly?: boolean
   onUpdateProfile: (data: {
     firstName: string
     lastName: string
@@ -17,6 +18,7 @@ export interface AccountProfileProps {
 
 export function AccountProfile({
   customer,
+  isEmailReadOnly = false,
   onUpdateProfile,
 }: AccountProfileProps) {
   const [formData, setFormData] = useState({
@@ -38,8 +40,9 @@ export function AccountProfile({
     try {
       await onUpdateProfile(formData)
       setSuccessMessage("Profile updated successfully.")
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update profile.")
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update profile."
+      setErrorMessage(msg)
     } finally {
       setIsSaving(false)
     }
@@ -72,13 +75,22 @@ export function AccountProfile({
           />
         </div>
 
-        <Input
-          label="Email Address"
-          type="email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
+        <div>
+          <Input
+            label={isEmailReadOnly ? "Email Address (Account Credential - Read Only)" : "Email Address"}
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            disabled={isEmailReadOnly}
+          />
+          {isEmailReadOnly && (
+            <p className="text-[11px] text-brand-muted mt-1">
+              Email is tied to your login identity and cannot be changed here.
+            </p>
+          )}
+        </div>
+
 
         <Input
           label="Phone Number (Courier Handover)"

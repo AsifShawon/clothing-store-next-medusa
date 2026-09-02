@@ -6,6 +6,8 @@ import { CustomerView } from "@dtc/commerce-contracts"
 import { AccountProfile } from "@dtc/storefront-ui"
 import { updateCustomer } from "@lib/data/customer"
 
+import { getErrorMessage } from "@lib/util/get-error-message"
+
 interface MedusaProfileClientProps {
   customer: CustomerView
 }
@@ -19,17 +21,22 @@ export default function MedusaProfileClient({ customer }: MedusaProfileClientPro
     email: string
     phone?: string
   }) => {
-    await updateCustomer({
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-    })
-    router.refresh()
+    try {
+      await updateCustomer({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        phone: data.phone,
+      })
+      router.refresh()
+    } catch (error: unknown) {
+      throw new Error(getErrorMessage(error))
+    }
   }
 
   return (
     <AccountProfile
       customer={customer}
+      isEmailReadOnly={true}
       onUpdateProfile={handleUpdateProfile}
     />
   )
