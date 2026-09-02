@@ -10,6 +10,7 @@
     "./theme": "./src/theme/index.ts",
     "./components": "./src/components/index.ts",
     "./views": "./src/views/index.ts",
+    "./tailwind.preset": "./tailwind.preset.js",
     "./styles/*": "./src/styles/*"
   },
   "scripts": {
