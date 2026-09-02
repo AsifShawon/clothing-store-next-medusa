@@ -1,9 +1,29 @@
 import fs from "fs"
 import path from "path"
+import { createRequire } from "module"
 
-console.log("🔍 Checking shared customer-facing UI consumption across apps...")
+function getTypeScript() {
+  const searchPaths = [
+    path.resolve(process.cwd(), "apps/backend/package.json"),
+    path.resolve(process.cwd(), "apps/storefront/package.json"),
+    path.resolve(process.cwd(), "apps/portfolio-demo/package.json"),
+    path.resolve(process.cwd(), "packages/storefront-ui/package.json"),
+  ]
+  for (const p of searchPaths) {
+    try {
+      const req = createRequire(p)
+      return req("typescript")
+    } catch {
+      // try next
+    }
+  }
+  throw new Error("Could not resolve 'typescript' from workspace packages.")
+}
 
-const REQUIRED_STOREFRONT_CONSUMPTIONS = [
+const ts = getTypeScript()
+
+
+export const REQUIRED_STOREFRONT_CONSUMPTIONS = [
   { file: "apps/storefront/src/app/[countryCode]/(main)/page.tsx", required: ["HomeView"] },
   { file: "apps/storefront/src/modules/store/components/catalog-client/index.tsx", required: ["CatalogView"] },
   { file: "apps/storefront/src/modules/categories/components/category-client/index.tsx", required: ["CategoryView"] },
@@ -17,6 +37,8 @@ const REQUIRED_STOREFRONT_CONSUMPTIONS = [
   { file: "apps/storefront/src/modules/account/components/orders-client/index.tsx", required: ["AccountOrders"] },
   { file: "apps/storefront/src/modules/account/components/profile-client/index.tsx", required: ["AccountProfile"] },
   { file: "apps/storefront/src/modules/account/components/addresses-client/index.tsx", required: ["AccountAddresses"] },
+  { file: "apps/storefront/src/modules/account/templates/login-template.tsx", required: ["AuthShell", "LoginForm", "RegisterForm", "ForgotPasswordForm"] },
+  { file: "apps/storefront/src/app/[countryCode]/(main)/account/reset-password/page.tsx", required: ["AuthShell", "ResetPasswordForm"] },
   { file: "apps/storefront/src/app/[countryCode]/(main)/about/page.tsx", required: ["AboutView"] },
   { file: "apps/storefront/src/app/[countryCode]/(main)/contact/page.tsx", required: ["ContactView"] },
   { file: "apps/storefront/src/app/[countryCode]/(main)/faq/page.tsx", required: ["FaqView"] },
@@ -27,7 +49,7 @@ const REQUIRED_STOREFRONT_CONSUMPTIONS = [
   { file: "apps/storefront/src/app/[countryCode]/(main)/terms-and-conditions/page.tsx", required: ["PolicyView"] },
 ]
 
-const REQUIRED_DEMO_CONSUMPTIONS = [
+export const REQUIRED_DEMO_CONSUMPTIONS = [
   { file: "apps/portfolio-demo/src/app/page.tsx", required: ["HomeView"] },
   { file: "apps/portfolio-demo/src/app/shop/page.tsx", required: ["CatalogView"] },
   { file: "apps/portfolio-demo/src/app/category/page.tsx", required: ["CategoryView"] },
@@ -36,6 +58,8 @@ const REQUIRED_DEMO_CONSUMPTIONS = [
   { file: "apps/portfolio-demo/src/app/cart/page.tsx", required: ["CartView"] },
   { file: "apps/portfolio-demo/src/app/checkout/page.tsx", required: ["CheckoutView"] },
   { file: "apps/portfolio-demo/src/app/order/page.tsx", required: ["OrderConfirmationView"] },
+  { file: "apps/portfolio-demo/src/app/account/page.tsx", required: ["AccountShell", "AccountOverview", "AccountProfile", "AccountAddresses", "AuthShell"] },
+  { file: "apps/portfolio-demo/src/app/account/orders/page.tsx", required: ["AccountShell", "AccountOrders", "AuthShell"] },
   { file: "apps/portfolio-demo/src/app/about/page.tsx", required: ["AboutView"] },
   { file: "apps/portfolio-demo/src/app/contact/page.tsx", required: ["ContactView"] },
   { file: "apps/portfolio-demo/src/app/faq/page.tsx", required: ["FaqView"] },
@@ -46,34 +70,129 @@ const REQUIRED_DEMO_CONSUMPTIONS = [
   { file: "apps/portfolio-demo/src/app/terms-and-conditions/page.tsx", required: ["PolicyView"] },
 ]
 
-let missingCount = 0
+export function analyzeAstForSharedUI(filePath, sourceCode) {
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    sourceCode,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
+  )
 
-function verifyConsumptions(list, appName) {
-  for (const item of list) {
-    const fullPath = path.resolve(process.cwd(), item.file)
-    if (!fs.existsSync(fullPath)) {
-      console.error(`❌ [${appName}] Missing required file: ${item.file}`)
-      missingCount++
-      continue
-    }
+  const importedFromSharedUI = new Map() // importedSymbol -> localName
+  const importedFromElsewhere = new Map() // importedSymbol -> moduleSpecifier
+  const jsxTagNames = new Set()
 
-    const content = fs.readFileSync(fullPath, "utf-8")
-    for (const comp of item.required) {
-      if (!content.includes(comp)) {
-        console.error(`❌ [${appName}] ${item.file} does NOT consume shared component <${comp}>`)
-        missingCount++
+  function visit(node) {
+    if (ts.isImportDeclaration(node)) {
+      const moduleSpecifier = node.moduleSpecifier.text
+      const namedBindings = node.importClause?.namedBindings
+
+      if (namedBindings && ts.isNamedImports(namedBindings)) {
+        for (const spec of namedBindings.elements) {
+          const importedName = spec.propertyName ? spec.propertyName.text : spec.name.text
+          const localName = spec.name.text
+
+          if (moduleSpecifier === "@dtc/storefront-ui") {
+            importedFromSharedUI.set(importedName, localName)
+          } else {
+            importedFromElsewhere.set(importedName, moduleSpecifier)
+          }
+        }
       }
     }
+
+    if (ts.isJsxElement(node)) {
+      const tagName = node.openingElement.tagName.getText(sourceFile)
+      jsxTagNames.add(tagName)
+    } else if (ts.isJsxSelfClosingElement(node)) {
+      const tagName = node.tagName.getText(sourceFile)
+      jsxTagNames.add(tagName)
+    }
+
+    ts.forEachChild(node, visit)
+  }
+
+  visit(sourceFile)
+
+  return {
+    importedFromSharedUI,
+    importedFromElsewhere,
+    jsxTagNames,
   }
 }
 
-verifyConsumptions(REQUIRED_STOREFRONT_CONSUMPTIONS, "Storefront")
-verifyConsumptions(REQUIRED_DEMO_CONSUMPTIONS, "Portfolio-Demo")
+export function verifyFileConsumption(filePath, requiredSymbols, sourceCodeOverride) {
+  const fullPath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath)
+  if (!sourceCodeOverride && !fs.existsSync(fullPath)) {
+    return {
+      success: false,
+      errors: [`File does not exist: ${filePath}`],
+    }
+  }
 
-if (missingCount > 0) {
-  console.error(`🚨 Shared UI verification FAILED with ${missingCount} missing consumption(s).`)
-  process.exit(1)
-} else {
-  console.log("✅ Shared UI verification PASSED: Both Storefront and Portfolio Demo fully consume @dtc/storefront-ui.")
-  process.exit(0)
+  const content = sourceCodeOverride ?? fs.readFileSync(fullPath, "utf-8")
+  const { importedFromSharedUI, importedFromElsewhere, jsxTagNames } = analyzeAstForSharedUI(fullPath, content)
+
+  const errors = []
+
+  for (const sym of requiredSymbols) {
+    if (!importedFromSharedUI.has(sym)) {
+      if (importedFromElsewhere.has(sym)) {
+        errors.push(
+          `Component '${sym}' is imported from '${importedFromElsewhere.get(sym)}', NOT from '@dtc/storefront-ui'`
+        )
+      } else {
+        errors.push(`Component '${sym}' is not imported from '@dtc/storefront-ui'`)
+      }
+      continue
+    }
+
+    const localIdentifier = importedFromSharedUI.get(sym)
+    if (!jsxTagNames.has(localIdentifier)) {
+      errors.push(
+        `Component '${sym}' (alias '${localIdentifier}') is imported from '@dtc/storefront-ui' but is NOT instantiated as a JSX Element <${localIdentifier} ... />`
+      )
+    }
+  }
+
+  return {
+    success: errors.length === 0,
+    errors,
+  }
+}
+
+export function runAllChecks() {
+  console.log("🔍 Checking shared customer-facing UI AST consumption across apps...")
+  let failureCount = 0
+
+  function auditList(list, label) {
+    for (const item of list) {
+      const result = verifyFileConsumption(item.file, item.required)
+      if (!result.success) {
+        failureCount++
+        console.error(`❌ [${label}] ${item.file}:`)
+        for (const err of result.errors) {
+          console.error(`     • ${err}`)
+        }
+      }
+    }
+  }
+
+  auditList(REQUIRED_STOREFRONT_CONSUMPTIONS, "Storefront")
+  auditList(REQUIRED_DEMO_CONSUMPTIONS, "Portfolio-Demo")
+
+  if (failureCount > 0) {
+    console.error(`🚨 Shared UI AST verification FAILED with ${failureCount} non-compliant file(s).`)
+    return false
+  } else {
+    console.log("✅ Shared UI AST verification PASSED: Both applications prove genuine AST import & JSX usage of @dtc/storefront-ui.")
+    return true
+  }
+}
+
+// Execute when run directly
+if (process.argv[1] && (process.argv[1].endsWith("check-shared-ui.mjs") || process.argv[1].includes("check-shared-ui"))) {
+  const success = runAllChecks()
+  process.exit(success ? 0 : 1)
 }
