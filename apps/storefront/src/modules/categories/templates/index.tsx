@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation"
-import { Suspense } from "react"
-import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
-import RefinementList from "@modules/store/components/refinement-list"
-import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
-import PaginatedProducts from "@modules/store/templates/paginated-products"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 import { OptionValueIds } from "@lib/util/product-option-filters"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { listProductsWithSort } from "@lib/data/products"
+import { listCategories } from "@lib/data/categories"
+import { toCategoryView, toProductView } from "../../../adapters/medusa/catalog"
+import MedusaCategoryClient from "../components/category-client"
 
-export default function CategoryTemplate({
+const PRODUCT_LIMIT = 24
+
+export default async function CategoryTemplate({
   category,
   sortBy,
   page,
@@ -26,66 +27,36 @@ export default function CategoryTemplate({
 
   if (!category || !countryCode) notFound()
 
+  const queryParams: Record<string, any> = {
+    limit: PRODUCT_LIMIT,
+    category_id: [category.id],
+  }
+
+  if (sort === "created_at") {
+    queryParams["order"] = "created_at"
+  }
+
+  const [{ response }, allCategories] = await Promise.all([
+    listProductsWithSort({
+      page: pageNumber,
+      queryParams,
+      sortBy: sort,
+      countryCode,
+      optionValueIds,
+    }),
+    listCategories().catch(() => []),
+  ])
+
+  const productViews = (response.products || []).map((p) => toProductView(p, "bdt"))
+  const categoryViews = (allCategories || []).map(toCategoryView)
+
   return (
-    <div className="bg-white min-h-screen">
-      {/* Category Banner */}
-      <div className="bg-brand-secondary border-b border-brand-border py-10 sm:py-14">
-        <div className="content-container">
-          <div className="flex items-center gap-2 text-xs text-brand-primary/60 mb-3">
-            <LocalizedClientLink href="/" className="hover:text-brand-primary">
-              Home
-            </LocalizedClientLink>
-            <span>/</span>
-            <LocalizedClientLink href="/store" className="hover:text-brand-primary">
-              Categories
-            </LocalizedClientLink>
-            <span>/</span>
-            <span className="text-brand-primary font-medium">{category.name}</span>
-          </div>
-
-          <div className="inline-block px-2.5 py-0.5 bg-brand-primary text-white text-[10px] font-heading font-semibold uppercase tracking-widest mb-2">
-            Category
-          </div>
-          <h1
-            className="font-display text-3xl sm:text-4xl lg:text-5xl text-brand-primary"
-            data-testid="category-page-title"
-          >
-            {category.name}
-          </h1>
-          <p className="text-xs sm:text-sm text-brand-primary/70 mt-2 max-w-xl">
-            {category.description || `Explore our curated selection of ${category.name} crafted for British smart-casual elegance.`}
-          </p>
-        </div>
-      </div>
-
-      {/* Main Grid */}
-      <div
-        className="content-container flex flex-col small:flex-row small:items-start py-10"
-        data-testid="category-container"
-      >
-        <RefinementList
-          sortBy={sort}
-          data-testid="sort-by-container"
-          hideOptionsPicker
-        />
-        <div className="w-full flex-1">
-          <Suspense
-            fallback={
-              <SkeletonProductGrid
-                numberOfProducts={category.products?.length ?? 8}
-              />
-            }
-          >
-            <PaginatedProducts
-              sortBy={sort}
-              page={pageNumber}
-              categoryId={category.id}
-              countryCode={countryCode}
-              optionValueIds={optionValueIds}
-            />
-          </Suspense>
-        </div>
-      </div>
-    </div>
+    <MedusaCategoryClient
+      category={toCategoryView(category)}
+      products={productViews}
+      totalCount={response.count}
+      countryCode={countryCode}
+      currentSortBy={sort}
+    />
   )
 }

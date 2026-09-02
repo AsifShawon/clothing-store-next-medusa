@@ -1,11 +1,19 @@
 import {
   AddressFormView,
+  AddressView,
   CartItemView,
+  CartLineView,
   CartTotalsView,
   CartView,
   createMoneyView,
+  CurrencyCode,
+  OrderLineView,
+  OrderPaymentStatusView,
+  OrderStatusView,
   OrderView,
+  PromotionView,
   ShippingMethodView,
+  ShippingOptionView,
 } from "@dtc/commerce-contracts"
 import { HttpTypes } from "@medusajs/types"
 
@@ -15,23 +23,28 @@ export function toCartItemView(
 ): CartItemView {
   return {
     id: item.id,
+    productId: item.product_id || item.product?.id || "",
+    productTitle: item.product_title || item.title || "Garment",
     title: item.title || item.product_title || "Garment",
-    subtitle: item.subtitle || item.variant_title,
+    subtitle: item.subtitle || item.variant_title || "",
+    productHandle: item.product_handle || "",
+    variantId: item.variant_id || item.variant?.id || "",
+    variantTitle: item.variant_title || "",
+    sku: item.variant_sku || item.variant?.sku || item.id,
     thumbnail: item.thumbnail
       ? {
           id: `${item.id}-thumb`,
           url: item.thumbnail,
-          altText: item.title,
+          altText: item.title || "Garment",
         }
       : undefined,
-    variantTitle: item.variant_title,
-    quantity: item.quantity,
     unitPrice: createMoneyView(item.unit_price ?? 0, currencyCode),
     totalPrice: createMoneyView(item.total ?? 0, currencyCode),
     originalTotalPrice: item.original_total
       ? createMoneyView(item.original_total, currencyCode)
       : undefined,
-    productHandle: item.product_handle,
+    quantity: item.quantity,
+    options: {},
   }
 }
 
@@ -55,17 +68,19 @@ export function toCartTotalsView(
 }
 
 export function toCartView(cart: HttpTypes.StoreCart): CartView {
-  const currencyCode = cart.currency_code || "bdt"
-  const items = (cart.items || []).map((item) => toCartItemView(item, currencyCode))
+  const currencyCode = (cart.currency_code || "bdt") as CurrencyCode
+  const items: CartLineView[] = (cart.items || []).map((item) =>
+    toCartItemView(item, currencyCode)
+  )
   const itemsCount = items.reduce((sum, i) => sum + i.quantity, 0)
   const totals = toCartTotalsView(cart, currencyCode)
 
-  const promotions = (cart.promotions || []).map((p) => {
-    const promo = p as HttpTypes.StorePromotion
+  const appliedPromotions: PromotionView[] = (cart.promotions || []).map((p) => {
+    const promo = p as any
     return {
       id: promo.id,
       code: promo.code || "PROMO",
-      description: promo.application_method?.description,
+      description: promo.application_method?.description || undefined,
       discountType: "percentage" as const,
       amount: cart.discount_total ?? 0,
       formattedDiscount: `-${totals.discount?.formatted || "৳0"}`,
@@ -77,8 +92,10 @@ export function toCartView(cart: HttpTypes.StoreCart): CartView {
     items,
     itemsCount,
     totals,
-    promotions,
-    region: cart.region?.name || "Bangladesh",
+    appliedPromotions,
+    promotions: appliedPromotions,
+    currencyCode,
+    regionName: cart.region?.name || "Bangladesh",
   }
 }
 
@@ -103,68 +120,88 @@ export function toAddressFormView(address?: HttpTypes.StoreCartAddress | null): 
     city: address?.city || "Dhaka",
     postalCode: address?.postal_code || "",
     province: address?.province || "",
-    countryCode: address?.country_code || "bd",
+    country: address?.country_code || "Bangladesh",
     phone: address?.phone || "",
   }
 }
 
 export function toOrderView(order: HttpTypes.StoreOrder): OrderView {
   const currencyCode = order.currency_code || "bdt"
-  const items: CartItemView[] = (order.items || []).map((item: HttpTypes.StoreOrderLineItem) => ({
+  const items: OrderLineView[] = (order.items || []).map((item: any) => ({
     id: item.id,
-    title: item.title || item.product_title || "Garment",
-    subtitle: item.subtitle || item.variant_title,
+    productId: item.product_id || "",
+    productTitle: item.product_title || item.title || "Garment",
+    productHandle: item.product_handle || "",
+    variantTitle: item.variant_title || "",
+    sku: item.variant_sku || item.id,
     thumbnail: item.thumbnail
       ? {
           id: `${item.id}-thumb`,
           url: item.thumbnail,
-          altText: item.title,
+          altText: item.title || "Garment",
         }
       : undefined,
-    variantTitle: item.variant_title,
-    quantity: item.quantity,
     unitPrice: createMoneyView(item.unit_price ?? 0, currencyCode),
     totalPrice: createMoneyView(item.total ?? 0, currencyCode),
-    productHandle: item.product_handle,
+    quantity: item.quantity,
   }))
 
   const totals = toCartTotalsView(order, currencyCode)
 
-  const paymentStatusMap: Record<string, OrderView["paymentStatus"]> = {
-    not_paid: "awaiting",
-    awaiting: "awaiting",
-    authorized: "captured",
-    partially_authorized: "captured",
+  const paymentStatusMap: Record<string, OrderPaymentStatusView> = {
+    not_paid: "pending",
+    awaiting: "pending",
+    authorized: "authorized",
+    partially_authorized: "authorized",
     captured: "captured",
     partially_captured: "captured",
     canceled: "failed",
-    requires_action: "awaiting",
+    requires_action: "pending",
     refunded: "refunded",
     partially_refunded: "refunded",
   }
 
-  const fulfillmentStatusMap: Record<string, OrderView["fulfillmentStatus"]> = {
-    not_fulfilled: "not_fulfilled",
-    partially_fulfilled: "fulfilled",
-    fulfilled: "fulfilled",
-    partially_shipped: "shipped",
-    shipped: "shipped",
-    partially_delivered: "delivered",
-    delivered: "delivered",
-    canceled: "not_fulfilled",
+  const orderStatusMap: Record<string, OrderStatusView> = {
+    pending: "pending",
+    completed: "delivered",
+    draft: "pending",
+    archived: "delivered",
+    canceled: "canceled",
+    requires_action: "pending",
+  }
+
+  const defaultShipping: ShippingOptionView = {
+    id: "medusa-shipping",
+    name: "Standard Dispatch",
+    price: totals.shipping || createMoneyView(0, currencyCode),
   }
 
   return {
     id: order.id,
-    displayId: order.display_id,
-    status: order.status === "canceled" ? "canceled" : "completed",
+    displayId: String(order.display_id ?? order.id),
+    status: orderStatusMap[order.status] || "processing",
     paymentStatus: paymentStatusMap[order.payment_status] || "captured",
-    fulfillmentStatus: fulfillmentStatusMap[order.fulfillment_status] || "fulfilled",
-    createdAt: order.created_at,
+    fulfillmentStatus: (order as any).fulfillment_status || "confirmed",
+    createdAt:
+      typeof order.created_at === "string"
+        ? order.created_at
+        : new Date(order.created_at).toISOString(),
     email: order.email || "",
-    currencyCode,
     items,
     shippingAddress: toAddressFormView(order.shipping_address),
-    totals,
+    shippingOption: defaultShipping,
+    shippingMethod: defaultShipping,
+    paymentMethod: "Electronic Payment",
+    itemSubtotal: totals.subtotal,
+    discountTotal: totals.discount || createMoneyView(0, currencyCode),
+    shippingTotal: totals.shipping || createMoneyView(0, currencyCode),
+    total: totals.total,
+    totals: {
+      subtotal: totals.subtotal,
+      discount: totals.discount,
+      shipping: totals.shipping,
+      tax: totals.tax,
+      total: totals.total,
+    },
   }
 }

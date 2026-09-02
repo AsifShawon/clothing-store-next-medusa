@@ -35,6 +35,7 @@ export interface ProductDetailViewProps {
   breadcrumbs?: Array<{ label: string; href: string }>
   shareSlot?: React.ReactNode
   linkComponent?: LinkComponent
+  children?: React.ReactNode
 }
 
 export function ProductDetailView({
@@ -54,6 +55,7 @@ export function ProductDetailView({
   breadcrumbs,
   shareSlot,
   linkComponent: LinkComp = Link,
+  children,
 }: ProductDetailViewProps) {
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false)
 
@@ -183,6 +185,8 @@ export function ProductDetailView({
           linkComponent={LinkComp}
         />
       )}
+
+      {children}
 
       {/* Size Guide Modal */}
       <SizeGuideModal

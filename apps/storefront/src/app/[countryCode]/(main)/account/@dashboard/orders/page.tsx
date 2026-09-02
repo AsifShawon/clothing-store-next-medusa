@@ -1,10 +1,9 @@
 import { Metadata } from "next"
 import { constructMetadata } from "@lib/util/seo"
-import OrderOverview from "@modules/account/components/order-overview"
 import { notFound } from "next/navigation"
 import { listOrders } from "@lib/data/orders"
-import Divider from "@modules/common/components/divider"
-import TransferRequestForm from "@modules/account/components/transfer-request-form"
+import { toOrderView } from "@adapters/medusa/cart"
+import MedusaOrdersClient from "@modules/account/components/orders-client"
 
 export const metadata: Metadata = constructMetadata({
   title: "Orders | London Boy",
@@ -13,26 +12,13 @@ export const metadata: Metadata = constructMetadata({
 })
 
 export default async function Orders() {
-  const orders = await listOrders()
+  const orders = await listOrders().catch(() => [])
 
   if (!orders) {
     notFound()
   }
 
-  return (
-    <div className="w-full" data-testid="orders-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Orders</h1>
-        <p className="text-base-regular">
-          View your previous orders and their status. You can also create
-          returns or exchanges for your orders if needed.
-        </p>
-      </div>
-      <div>
-        <OrderOverview orders={orders} />
-        <Divider className="mb-8 mt-8" />
-        <TransferRequestForm />
-      </div>
-    </div>
-  )
+  const orderViews = (orders || []).map(toOrderView)
+
+  return <MedusaOrdersClient orders={orderViews} />
 }

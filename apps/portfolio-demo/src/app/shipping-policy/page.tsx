@@ -1,61 +1,68 @@
+"use client"
+
 import React from "react"
 import Link from "next/link"
+import { PolicyView } from "@dtc/storefront-ui"
+import { demoRoutes } from "../../adapters/local-storage/routes"
+
+const SHIPPING_SECTIONS = [
+  {
+    title: "1. Tiered Shipping Rate Structure",
+    content: (
+      <div className="space-y-2">
+        <p>
+          All orders are dispatched directly from our Dhaka Central Warehouse. We offer standard tiered flat rates across Bangladesh:
+        </p>
+        <ul className="list-disc list-inside space-y-1 pl-2">
+          <li><strong>Inside Dhaka Metro:</strong> ৳60 (Free on orders above ৳2,000)</li>
+          <li><strong>Dhaka Suburbs (Gazipur, Savar, Keraniganj):</strong> ৳100</li>
+          <li><strong>Outside Dhaka (All other 63 districts):</strong> ৳130</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    title: "2. Delivery Timelines & Schedules",
+    content: (
+      <div className="space-y-2">
+        <p>
+          Orders placed before 2:00 PM BST Sunday through Thursday are processed the same business day:
+        </p>
+        <ul className="list-disc list-inside space-y-1 pl-2">
+          <li><strong>Inside Dhaka:</strong> 24–48 hours from dispatch</li>
+          <li><strong>Dhaka Suburbs:</strong> 2–3 business days</li>
+          <li><strong>Divisional Cities & Nationwide:</strong> 3–5 business days</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    title: "3. Cash on Delivery (COD) Guidelines",
+    content: (
+      <p>
+        Cash on Delivery is available across all 64 districts of Bangladesh. Customers may inspect the outer parcel before payment handover. Any size exchanges or returns are covered under our 24-Hour Door-to-Door Exchange Guarantee.
+      </p>
+    ),
+  },
+  {
+    title: "4. Tracking & Courier Notification",
+    content: (
+      <p>
+        Once your package leaves our warehouse, you will receive an SMS and email with live courier tracking details from our logistics partners.
+      </p>
+    ),
+  },
+]
 
 export default function ShippingPolicyPage() {
   return (
-    <div className="content-container py-16 max-w-3xl mx-auto space-y-8">
-      <div className="border-b border-brand-border pb-6">
-        <span className="badge-tag bg-brand-secondary text-brand-accent">Delivery Standards</span>
-        <h1 className="font-display text-4xl text-brand-primary mt-2">Shipping & Delivery Policy</h1>
-        <p className="text-xs text-grey-60 mt-1">Last updated: September 2026 • Bangladesh Delivery Network</p>
-      </div>
-
-      <div className="prose prose-sm text-grey-70 space-y-6 text-xs sm:text-sm leading-relaxed">
-        <h2 className="font-heading font-bold text-base text-brand-primary">1. Delivery Zones & Rates</h2>
-        <div className="border border-brand-border bg-brand-card p-4 space-y-3">
-          <div className="flex justify-between items-center border-b border-brand-border/60 pb-2">
-            <div>
-              <strong className="text-brand-primary block">Inside Dhaka City</strong>
-              <span className="text-xs text-grey-50">Timeline: 24 - 48 Hours</span>
-            </div>
-            <span className="font-bold text-brand-primary">৳60</span>
-          </div>
-
-          <div className="flex justify-between items-center border-b border-brand-border/60 pb-2">
-            <div>
-              <strong className="text-brand-primary block">Dhaka Suburban (Gazipur, Savar, Narayanganj)</strong>
-              <span className="text-xs text-grey-50">Timeline: 2 - 3 Business Days</span>
-            </div>
-            <span className="font-bold text-brand-primary">৳100</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <div>
-              <strong className="text-brand-primary block">Outside Dhaka (All 64 Districts)</strong>
-              <span className="text-xs text-grey-50">Timeline: 3 - 5 Business Days</span>
-            </div>
-            <span className="font-bold text-brand-primary">৳130</span>
-          </div>
-        </div>
-
-        <h2 className="font-heading font-bold text-base text-brand-primary pt-4">2. Dispatch & Tracking</h2>
-        <p>
-          All orders placed before 4:00 PM BST are dispatched the same day from our Central Warehouse in Tejgaon, Dhaka.
-          Customers receive tracking updates via SMS and phone confirmation prior to delivery attempt.
-        </p>
-
-        <h2 className="font-heading font-bold text-base text-brand-primary pt-4">3. Cash on Delivery Terms</h2>
-        <p>
-          Cash on Delivery is available across all serviceable delivery zones. Customers may inspect the outer package
-          seal upon receipt before completing payment to the courier rider.
-        </p>
-      </div>
-
-      <div className="pt-6 border-t border-brand-border">
-        <Link href="/shop" className="contrast-btn text-xs inline-block">
-          Explore Garments
-        </Link>
-      </div>
-    </div>
+    <PolicyView
+      badge="Delivery Standards"
+      title="Shipping & Delivery Policy"
+      subtitle="Direct dispatch from our Dhaka Central Warehouse with transparent tiered pricing across all 64 districts of Bangladesh."
+      sections={SHIPPING_SECTIONS}
+      routes={demoRoutes}
+      linkComponent={Link}
+    />
   )
 }

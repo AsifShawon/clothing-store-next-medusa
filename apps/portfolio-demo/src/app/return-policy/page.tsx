@@ -1,44 +1,59 @@
+"use client"
+
 import React from "react"
 import Link from "next/link"
+import { PolicyView } from "@dtc/storefront-ui"
+import { demoRoutes } from "../../adapters/local-storage/routes"
+
+const RETURN_SECTIONS = [
+  {
+    title: "1. 24-Hour Door-to-Door Exchange Guarantee",
+    content: (
+      <p>
+        If your garment does not fit as expected, request a size exchange within 24 hours of delivery handover. For addresses inside Dhaka, our courier will deliver the replacement size directly to your doorstep while collecting the original garment.
+      </p>
+    ),
+  },
+  {
+    title: "2. Eligibility & Garment Condition",
+    content: (
+      <div className="space-y-2">
+        <p>To qualify for a return or exchange, garments must:</p>
+        <ul className="list-disc list-inside space-y-1 pl-2">
+          <li>Be unworn, unwashed, and undamaged</li>
+          <li>Have all original London Boy woven brand tags attached</li>
+          <li>Be returned in original brand packaging</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    title: "3. Refund Processing",
+    content: (
+      <p>
+        For orders paid online, approved refunds are issued back to the original payment method within 5–7 business days of warehouse inspection. For Cash on Delivery orders, refunds are issued via bKash, Nagad, or bank transfer.
+      </p>
+    ),
+  },
+  {
+    title: "4. How to Initiate a Return",
+    content: (
+      <p>
+        Email <strong>care@londonboy.uk</strong> or contact our support concierge with your Order ID, photo of the garment tag, and reason for exchange or return.
+      </p>
+    ),
+  },
+]
 
 export default function ReturnPolicyPage() {
   return (
-    <div className="content-container py-16 max-w-3xl mx-auto space-y-8">
-      <div className="border-b border-brand-border pb-6">
-        <span className="badge-tag bg-brand-secondary text-brand-accent">Hassle-Free Exchanges</span>
-        <h1 className="font-display text-4xl text-brand-primary mt-2">Return & Exchange Policy</h1>
-        <p className="text-xs text-grey-60 mt-1">24-Hour Sizing Guarantee • Dhaka Central Fulfilment</p>
-      </div>
-
-      <div className="prose prose-sm text-grey-70 space-y-6 text-xs sm:text-sm leading-relaxed">
-        <h2 className="font-heading font-bold text-base text-brand-primary">1. 24-Hour Size Exchange Window</h2>
-        <p>
-          We want you to feel completely confident in the fit and drape of your London Boy garment. If the size you
-          ordered does not match your expectations, you may request an exchange within 24 hours of parcel delivery.
-        </p>
-
-        <h2 className="font-heading font-bold text-base text-brand-primary pt-4">2. Garment Condition Criteria</h2>
-        <p>
-          To qualify for an exchange, items must be:
-        </p>
-        <ul className="list-disc pl-5 space-y-1 text-grey-60">
-          <li>Unworn, unwashed, and free from fragrance, stains, or markings.</li>
-          <li>In original packaging with all brand tags intact.</li>
-          <li>Accompanied by the original order invoice or packing slip.</li>
-        </ul>
-
-        <h2 className="font-heading font-bold text-base text-brand-primary pt-4">3. Exchange Process</h2>
-        <p>
-          To initiate an exchange, message our customer support team at <strong>+880 1712 345678</strong> with your order
-          number and desired replacement size. Our rider will collect the item and deliver your replacement.
-        </p>
-      </div>
-
-      <div className="pt-6 border-t border-brand-border">
-        <Link href="/contact" className="contrast-btn text-xs inline-block">
-          Contact Support
-        </Link>
-      </div>
-    </div>
+    <PolicyView
+      badge="Peace of Mind Guarantee"
+      title="24-Hour Return & Refund Policy"
+      subtitle="We want you to feel confident in every stitch. If the size or fit isn't perfect, we make returns and exchanges straightforward."
+      sections={RETURN_SECTIONS}
+      routes={demoRoutes}
+      linkComponent={Link}
+    />
   )
 }

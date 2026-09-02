@@ -60,7 +60,7 @@ export function toProductView(medusaProduct: HttpTypes.StoreProduct, currencyCod
 
     return {
       id: v.id,
-      title: v.title,
+      title: v.title || "Default",
       sku: v.sku || v.id,
       price: createMoneyView(calculatedPrice, currencyCode),
       originalPrice: originalPrice ? createMoneyView(originalPrice, currencyCode) : undefined,
