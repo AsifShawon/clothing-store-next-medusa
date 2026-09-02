@@ -6,7 +6,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export default function AnnouncementBar() {
   return (
     <SharedAnnouncementBar
-      linkComponent={LocalizedClientLink as any}
+      linkComponent={LocalizedClientLink}
       centerHref="/store"
       rightLinkHref="/return-policy"
     />

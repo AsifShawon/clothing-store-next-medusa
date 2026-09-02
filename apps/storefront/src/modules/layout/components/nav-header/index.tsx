@@ -40,7 +40,7 @@ export default function NavHeader({
         accountHref="/account"
         cartCountNode={cartCountNode}
         onOpenSearch={() => setIsSearchOpen(true)}
-        linkComponent={LocalizedClientLink as any}
+        linkComponent={LocalizedClientLink}
         mobileMenuSlot={<SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />}
         headerActionsSlot={
           <div className="hidden sm:flex items-center text-[11px] font-semibold uppercase tracking-wider text-brand-primary/80 bg-brand-secondary/80 border border-brand-border px-2.5 py-1">

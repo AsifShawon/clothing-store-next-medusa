@@ -15,7 +15,7 @@ export interface HeaderProps {
   onOpenMobileMenu?: () => void
   mobileMenuSlot?: React.ReactNode
   headerActionsSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode; "data-testid"?: string }>
+  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
 }
 
 export function Header({

@@ -1,2 +1,4 @@
-// Export shared views as they are extracted
-export {}
+export * from "./HomeView"
+export * from "./CatalogView"
+export * from "./CategoryView"
+export * from "./CollectionView"

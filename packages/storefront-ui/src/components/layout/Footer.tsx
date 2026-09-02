@@ -13,7 +13,7 @@ export interface FooterProps {
   customerCareLinks?: FooterLinkItem[]
   policyLinks?: FooterLinkItem[]
   customControlsSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
 }
 
 const DEFAULT_CATEGORIES: FooterLinkItem[] = [

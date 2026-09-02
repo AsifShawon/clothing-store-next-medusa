@@ -11,7 +11,7 @@ export interface AnnouncementBarProps {
   rightLinkHref?: string
   showDismiss?: boolean
   onDismiss?: () => void
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
 }
 
 export function AnnouncementBar({

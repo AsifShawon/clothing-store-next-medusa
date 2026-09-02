@@ -35,7 +35,7 @@ export default async function Footer() {
       homeHref="/"
       categories={categories}
       collections={collectionsList}
-      linkComponent={LocalizedClientLink as any}
+      linkComponent={LocalizedClientLink}
     />
   )
 }
