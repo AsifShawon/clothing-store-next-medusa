@@ -10,6 +10,8 @@ export interface StoreRoutes {
   account(): string
   accountOrders(): string
   accountOrderDetail(id: string): string
+  accountProfile?(): string
+  accountAddresses?(): string
   about(): string
   contact(): string
   faq(): string
