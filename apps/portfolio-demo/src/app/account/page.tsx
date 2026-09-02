@@ -8,9 +8,12 @@ import {
   AccountOverview,
   AccountProfile,
   AccountShell,
+  AuthShell,
   LoginPrompt,
 } from "@dtc/storefront-ui"
+import { AddressFormView } from "@dtc/commerce-contracts"
 import { toCustomerView } from "../../adapters/local-storage/account"
+
 import { toOrderView } from "../../adapters/local-storage/cart"
 import { demoRoutes } from "../../adapters/local-storage/routes"
 
@@ -40,10 +43,15 @@ export default function AccountPage() {
 
   if (!isLoggedIn) {
     return (
-      <LoginPrompt
-        isSimulatedDemo
-        onDemoLogin={loginAsDemoCustomer}
-      />
+      <AuthShell
+        title="Customer Portal"
+        subtitle="This is a portfolio demonstration environment. No real credentials are required. Click below to continue with the seeded demo customer session."
+      >
+        <LoginPrompt
+          isSimulatedDemo
+          onDemoLogin={loginAsDemoCustomer}
+        />
+      </AuthShell>
     )
   }
 
@@ -61,21 +69,23 @@ export default function AccountPage() {
     })
   }
 
-  const handleSaveAddress = (address: any) => {
+  const handleSaveAddress = (address: AddressFormView) => {
+
     updateCustomerProfile({
       defaultAddress: {
         firstName: address.firstName,
         lastName: address.lastName,
         email: customer.email,
-        phone: address.phone,
+        phone: address.phone || "",
         address1: address.address1,
-        address2: address.address2,
+        address2: address.address2 || "",
         city: address.city,
-        postalCode: address.postalCode,
+        postalCode: address.postalCode || "",
         country: "Bangladesh",
       },
     })
   }
+
 
   return (
     <AccountShell

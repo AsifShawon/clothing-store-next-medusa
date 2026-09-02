@@ -3,7 +3,7 @@
 import React, { useMemo } from "react"
 import Link from "next/link"
 import { useDemoCustomer, useDemoOrders } from "@lib/demo-store-context"
-import { AccountOrders, AccountShell, LoginPrompt } from "@dtc/storefront-ui"
+import { AccountOrders, AccountShell, AuthShell, LoginPrompt } from "@dtc/storefront-ui"
 import { toCustomerView } from "../../../adapters/local-storage/account"
 import { toOrderView } from "../../../adapters/local-storage/cart"
 import { demoRoutes } from "../../../adapters/local-storage/routes"
@@ -31,8 +31,16 @@ export default function AccountOrdersPage() {
   )
 
   if (!isLoggedIn) {
-    return <LoginPrompt isSimulatedDemo onDemoLogin={loginAsDemoCustomer} />
+    return (
+      <AuthShell
+        title="Order History"
+        subtitle="This is a portfolio demonstration environment. Sign in with the seeded customer session to view simulated orders."
+      >
+        <LoginPrompt isSimulatedDemo onDemoLogin={loginAsDemoCustomer} />
+      </AuthShell>
+    )
   }
+
 
   return (
     <AccountShell
