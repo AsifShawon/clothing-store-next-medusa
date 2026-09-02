@@ -9,6 +9,7 @@ export interface StoreCapabilities {
   hasCustomerAddresses: boolean
   hasOrderTracking: boolean
   hasShareButton?: boolean
+  hasPromotions?: boolean
 }
 
 export const DEFAULT_MEDUSA_CAPABILITIES: StoreCapabilities = {
@@ -22,6 +23,7 @@ export const DEFAULT_MEDUSA_CAPABILITIES: StoreCapabilities = {
   hasCustomerAddresses: true,
   hasOrderTracking: false,
   hasShareButton: false,
+  hasPromotions: true,
 }
 
 export const DEFAULT_DEMO_CAPABILITIES: StoreCapabilities = {
@@ -35,4 +37,5 @@ export const DEFAULT_DEMO_CAPABILITIES: StoreCapabilities = {
   hasCustomerAddresses: true,
   hasOrderTracking: true,
   hasShareButton: true,
+  hasPromotions: true,
 }

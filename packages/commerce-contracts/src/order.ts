@@ -42,10 +42,13 @@ export interface OrderView {
   displayId: string
   status: OrderStatusView
   paymentStatus: OrderPaymentStatusView
+  fulfillmentStatus?: string
   createdAt: string
+  email?: string
   items: OrderLineView[]
   shippingAddress: AddressView
   shippingOption: ShippingOptionView
+  shippingMethod?: ShippingOptionView
   paymentMethod: string
   paymentDetails?: {
     simulatedMethod?: string
@@ -56,6 +59,13 @@ export interface OrderView {
   discountTotal: MoneyView
   shippingTotal: MoneyView
   total: MoneyView
+  totals?: {
+    subtotal: MoneyView
+    discount?: MoneyView
+    shipping?: MoneyView
+    total: MoneyView
+    tax?: MoneyView
+  }
   appliedPromotionCode?: string
   trackingNumber?: string
   courier?: string

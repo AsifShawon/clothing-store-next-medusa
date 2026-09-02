@@ -14,14 +14,19 @@ export interface AddressView {
   province?: string
 }
 
+export type AddressFormView = AddressView
+
 export interface ShippingOptionView {
   id: string
   name: string
   description?: string
   price: MoneyView
   estimatedDelivery?: string
+  estimatedDays?: string
   isSelected?: boolean
 }
+
+export type ShippingMethodView = ShippingOptionView
 
 export interface PaymentOptionView {
   id: string

@@ -5,6 +5,8 @@ export interface CartLineView {
   id: string
   productId: string
   productTitle: string
+  title?: string
+  subtitle?: string
   productHandle: string
   variantId: string
   variantTitle: string
@@ -12,6 +14,7 @@ export interface CartLineView {
   thumbnail?: ImageView
   unitPrice: MoneyView
   totalPrice: MoneyView
+  originalTotalPrice?: MoneyView
   quantity: number
   maxQuantity?: number
   options: Record<string, string>
@@ -28,10 +31,12 @@ export interface PromotionView {
   formattedDiscount: string
 }
 
+export type CartItemView = CartLineView
+
 export interface CartTotalsView {
   subtotal: MoneyView
-  discount: MoneyView
-  shipping: MoneyView
+  discount?: MoneyView
+  shipping?: MoneyView
   total: MoneyView
   tax?: MoneyView
   freeShippingThreshold?: MoneyView
@@ -45,6 +50,7 @@ export interface CartView {
   itemsCount: number
   totals: CartTotalsView
   appliedPromotions: PromotionView[]
+  promotions?: PromotionView[]
   currencyCode: CurrencyCode
   regionName?: string
 }
