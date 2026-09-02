@@ -19,13 +19,21 @@ import { HttpTypes } from "@medusajs/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 
+type PaymentProps = {
+  cart: HttpTypes.StoreCart
+  availablePaymentMethods: { id: string }[]
+  isOpen?: boolean
+  hideSubmitButton?: boolean
+  onPaymentMethodChange?: (method: string) => void
+}
+
 const Payment = ({
   cart,
   availablePaymentMethods,
-}: {
-  cart: HttpTypes.StoreCart
-  availablePaymentMethods: { id: string }[]
-}) => {
+  isOpen = true,
+  hideSubmitButton = false,
+  onPaymentMethodChange,
+}: PaymentProps) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
   )
@@ -34,24 +42,24 @@ const Payment = ({
   const [error, setError] = useState<string | null>(null)
   const [paymentComplete, setPaymentComplete] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
-    activeSession?.provider_id ?? ""
+    activeSession?.provider_id ?? availablePaymentMethods?.[0]?.id ?? ""
   )
 
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams.get("step") === "payment"
-
   const setPaymentMethod = async (method: string) => {
     setError(null)
     setSelectedPaymentMethod(method)
+    onPaymentMethodChange?.(method)
     if (isStripeLike(method)) {
       await initiatePaymentSession(cart, {
         provider_id: method,
       })
     }
   }
+
 
   const paidByGiftcard = !!(
     (cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0
@@ -188,22 +196,25 @@ const Payment = ({
             data-testid="payment-method-error-message"
           />
 
-          <Button
-            size="large"
-            className="mt-6"
-            onClick={handleSubmit}
-            isLoading={isLoading}
-            disabled={
-              (isStripeLike(selectedPaymentMethod) && !paymentComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
-            }
-            data-testid="submit-payment-button"
-          >
-            {!activeSession && isStripeLike(selectedPaymentMethod)
-              ? "Enter payment details"
-              : "Continue to review"}
-          </Button>
+          {!hideSubmitButton && (
+            <Button
+              size="large"
+              className="mt-6"
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              disabled={
+                (isStripeLike(selectedPaymentMethod) && !paymentComplete) ||
+                (!selectedPaymentMethod && !paidByGiftcard)
+              }
+              data-testid="submit-payment-button"
+            >
+              {!activeSession && isStripeLike(selectedPaymentMethod)
+                ? "Enter payment details"
+                : "Continue to review"}
+            </Button>
+          )}
         </div>
+
 
         <div className={isOpen ? "hidden" : "block"}>
           {cart && paymentReady && activeSession ? (

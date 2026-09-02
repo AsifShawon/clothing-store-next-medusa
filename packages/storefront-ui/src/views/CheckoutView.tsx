@@ -25,9 +25,17 @@ export interface CheckoutViewProps {
   shippingAddress: AddressFormView
   onShippingAddressChange: (address: AddressFormView) => void
   addressErrors?: Partial<Record<keyof AddressFormView, string>>
+  onSaveContactAndAddress?: (address: AddressFormView, email: string) => Promise<void> | void
+  isSavingAddress?: boolean
+  canContinueToShipping?: boolean
   shippingMethods: ShippingMethodView[]
   selectedShippingMethodId?: string
   onSelectShippingMethod: (id: string) => void
+  isSelectingShipping?: boolean
+  canContinueToPayment?: boolean
+  isInitializingPayment?: boolean
+  selectedPaymentMethodId?: string
+  onSelectPaymentMethod?: (id: string) => Promise<void> | void
   paymentSlot: React.ReactNode
   items: CartItemView[]
   totals: CartTotalsView
@@ -35,6 +43,7 @@ export interface CheckoutViewProps {
   onApplyPromoCode?: (code: string) => Promise<boolean | void> | boolean | void
   onRemovePromoCode?: (code: string) => Promise<void> | void
   promoError?: string
+  checkoutError?: string | null
   routes: StoreRoutes
   capabilities?: StoreCapabilities
   onPlaceOrder: () => void | Promise<void>
@@ -50,9 +59,17 @@ export function CheckoutView({
   shippingAddress,
   onShippingAddressChange,
   addressErrors = {},
+  onSaveContactAndAddress,
+  isSavingAddress = false,
+  canContinueToShipping = true,
   shippingMethods,
   selectedShippingMethodId,
   onSelectShippingMethod,
+  isSelectingShipping = false,
+  canContinueToPayment = true,
+  isInitializingPayment = false,
+  selectedPaymentMethodId,
+  onSelectPaymentMethod,
   paymentSlot,
   items,
   totals,
@@ -60,6 +77,7 @@ export function CheckoutView({
   onApplyPromoCode,
   onRemovePromoCode,
   promoError,
+  checkoutError,
   routes,
   capabilities,
   onPlaceOrder,
@@ -69,6 +87,7 @@ export function CheckoutView({
   linkComponent: LinkComp = Link,
 }: CheckoutViewProps) {
   const selectedShipping = shippingMethods.find((s) => s.id === selectedShippingMethodId)
+
 
   return (
     <div className="bg-white min-h-screen py-8 sm:py-14">
@@ -95,6 +114,16 @@ export function CheckoutView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
           {/* Left Flow Column (7 cols) */}
           <div className="lg:col-span-7 space-y-10">
+            {checkoutError && (
+              <div
+                className="p-4 bg-red-50 border border-rose-300 text-rose-800 text-xs font-medium flex items-start gap-2"
+                data-testid="checkout-error-banner"
+              >
+                <span className="font-bold">⚠️</span>
+                <div>{checkoutError}</div>
+              </div>
+            )}
+
             {/* Step 1: Customer Contact */}
             <section className="space-y-4">
               <div className="flex items-center gap-2 border-b border-brand-border pb-3">
@@ -131,6 +160,21 @@ export function CheckoutView({
                 onChange={onShippingAddressChange}
                 errors={addressErrors}
               />
+              {onSaveContactAndAddress && (
+                <div className="pt-2 flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={() => onSaveContactAndAddress(shippingAddress, email)}
+                    isLoading={isSavingAddress}
+                    disabled={isSavingAddress}
+                    variant="secondary"
+                    className="h-10 text-xs font-bold uppercase tracking-wider"
+                    data-testid="save-address-button"
+                  >
+                    {canContinueToShipping ? "Update Saved Address" : "Save Address & Continue →"}
+                  </Button>
+                </div>
+              )}
             </section>
 
             {/* Step 3: Delivery Options */}
@@ -143,11 +187,18 @@ export function CheckoutView({
                   Delivery Method
                 </h3>
               </div>
-              <ShippingMethodSelect
-                methods={shippingMethods}
-                selectedId={selectedShippingMethodId}
-                onSelect={onSelectShippingMethod}
-              />
+              {!canContinueToShipping ? (
+                <div className="p-4 bg-brand-surface border border-brand-border text-xs text-brand-muted">
+                  Please complete and save your contact information and shipping address to view available delivery options.
+                </div>
+              ) : (
+                <ShippingMethodSelect
+                  methods={shippingMethods}
+                  selectedId={selectedShippingMethodId}
+                  onSelect={onSelectShippingMethod}
+                  disabled={isSelectingShipping}
+                />
+              )}
             </section>
 
             {/* Step 4: Payment Method (Provider-Specific Container Slot) */}
@@ -160,7 +211,13 @@ export function CheckoutView({
                   Payment Details
                 </h3>
               </div>
-              <PaymentSection paymentSlot={paymentSlot} />
+              {!canContinueToPayment ? (
+                <div className="p-4 bg-brand-surface border border-brand-border text-xs text-brand-muted">
+                  Please save your shipping address and select a delivery option to view payment details.
+                </div>
+              ) : (
+                <PaymentSection paymentSlot={paymentSlot} />
+              )}
             </section>
 
             {/* Step 5: Order Review & Place Order */}

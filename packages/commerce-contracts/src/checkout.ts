@@ -71,6 +71,25 @@ export interface PlaceOrderResult {
   errorMessage?: string
 }
 
+export interface CheckoutState {
+  isSavingAddress?: boolean
+  isSelectingShipping?: boolean
+  isInitializingPayment?: boolean
+  isPlacingOrder?: boolean
+  canContinueToShipping?: boolean
+  canContinueToPayment?: boolean
+  canPlaceOrder?: boolean
+  checkoutError?: string | null
+  selectedPaymentMethodId?: string
+}
+
+export interface CheckoutEventHandlers {
+  onSaveContactAndAddress?: (address: AddressFormView, email: string) => Promise<void> | void
+  onSelectShippingMethod?: (id: string) => Promise<void> | void
+  onSelectPaymentMethod?: (id: string) => Promise<void> | void
+  onPlaceOrder?: () => Promise<void> | void
+}
+
 export interface CheckoutActions {
   setAddress(input: CheckoutAddressInput): Promise<void>
   selectShipping(optionId: string): Promise<void>

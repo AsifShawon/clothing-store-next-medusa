@@ -82,6 +82,40 @@ export default function CheckoutPage() {
     )
   }
 
+  const isAddressComplete = Boolean(
+    email.trim() &&
+    email.includes("@") &&
+    shippingAddress.firstName.trim() &&
+    shippingAddress.lastName.trim() &&
+    shippingAddress.phone?.trim() &&
+    shippingAddress.address1.trim() &&
+    shippingAddress.city.trim()
+  )
+
+
+  const handleSaveContactAndAddress = (addr: AddressFormView, mail: string) => {
+    setErrorMessage("")
+    const errors: Partial<Record<keyof AddressFormView, string>> = {}
+    if (!addr.firstName?.trim()) errors.firstName = "First name is required"
+    if (!addr.lastName?.trim()) errors.lastName = "Last name is required"
+    if (!addr.phone?.trim()) errors.phone = "Phone number is required for Dhaka courier"
+    if (!addr.address1?.trim()) errors.address1 = "Delivery address is required"
+    if (!addr.city?.trim()) errors.city = "City / District is required"
+    if (!mail.trim() || !mail.includes("@")) {
+      setErrorMessage("Please provide a valid email address.")
+      return
+    }
+    if (Object.keys(errors).length > 0) {
+      setAddressErrors(errors)
+      setErrorMessage("Please fill in all required shipping address fields.")
+      return
+    }
+    setAddressErrors({})
+    setShippingAddress(addr)
+    setEmail(mail)
+    showToast("Address Saved", "Delivery destination recorded for checkout.", "success")
+  }
+
   const handlePlaceOrder = async () => {
     setErrorMessage("")
     const errors: Partial<Record<keyof AddressFormView, string>> = {}
@@ -135,8 +169,9 @@ export default function CheckoutPage() {
 
       showToast("Order Placed", `Order #${order.displayId} confirmed!`, "success")
       router.push(`/order?id=${order.id}`)
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to place order. Please try again.")
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to place order. Please try again."
+      setErrorMessage(msg)
       setIsSubmitting(false)
     }
   }
@@ -148,9 +183,16 @@ export default function CheckoutPage() {
       shippingAddress={shippingAddress}
       onShippingAddressChange={setShippingAddress}
       addressErrors={addressErrors}
+      onSaveContactAndAddress={handleSaveContactAndAddress}
+      canContinueToShipping={isAddressComplete}
       shippingMethods={shippingMethods}
       selectedShippingMethodId={shippingOptionId}
       onSelectShippingMethod={setShippingOptionId}
+      canContinueToPayment={isAddressComplete && !!selectedShipping}
+      selectedPaymentMethodId={paymentMethod}
+      onSelectPaymentMethod={(id) => setPaymentMethod(id as "cod" | "test_card" | "mobile_banking")}
+      checkoutError={errorMessage || null}
+
       paymentSlot={
         <div className="space-y-4">
           <div className="p-3 bg-brand-secondary/60 border border-brand-border text-xs flex items-center gap-2 text-brand-primary">

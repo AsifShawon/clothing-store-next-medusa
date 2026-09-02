@@ -14,8 +14,10 @@
     "./styles/*": "./src/styles/*"
   },
   "scripts": {
+    "test": "node -e \"const { createJiti } = require('jiti'); const jiti = createJiti(process.cwd()); jiti('./src/views/__tests__/checkout-transitions.test.ts');\"",
     "type-check": "tsc --noEmit"
   },
+
   "dependencies": {
     "@dtc/commerce-contracts": "workspace:*",
     "clsx": "^2.1.1"
