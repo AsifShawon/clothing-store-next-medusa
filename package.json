@@ -26,6 +26,8 @@
     "demo:lint": "turbo lint --filter=@dtc/portfolio-demo",
     "demo:test": "turbo test --filter=@dtc/portfolio-demo",
     "check:boundaries": "node scripts/check-package-boundaries.mjs",
+    "check:shared-ui": "node scripts/check-shared-ui.mjs",
+    "check:architecture": "node scripts/check-architecture.mjs",
     "type-check": "turbo type-check"
   },
   "pnpm": {
