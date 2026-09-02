@@ -17,7 +17,9 @@
     "demo:dev": "turbo dev --filter=@dtc/portfolio-demo",
     "demo:build": "turbo build --filter=@dtc/portfolio-demo",
     "demo:lint": "turbo lint --filter=@dtc/portfolio-demo",
-    "demo:test": "turbo test --filter=@dtc/portfolio-demo"
+    "demo:test": "turbo test --filter=@dtc/portfolio-demo",
+    "check:boundaries": "node scripts/check-package-boundaries.mjs",
+    "type-check": "turbo type-check"
   },
   "pnpm": {
     "overrides": {

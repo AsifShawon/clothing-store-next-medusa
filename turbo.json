@@ -20,6 +20,9 @@
     },
     "seed": {
       "outputs": []
+    },
+    "type-check": {
+      "outputs": []
     }
   }
 }
