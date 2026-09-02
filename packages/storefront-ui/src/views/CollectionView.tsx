@@ -10,6 +10,7 @@ import {
   StoreRoutes,
 } from "@dtc/commerce-contracts"
 import { CatalogView } from "./CatalogView"
+import { LinkComponent } from "../types"
 
 export interface CollectionViewProps {
   collection: CollectionModel
@@ -20,7 +21,7 @@ export interface CollectionViewProps {
   onResetFilters: () => void
   routes: StoreRoutes
   capabilities?: StoreCapabilities
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function CollectionView({

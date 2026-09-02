@@ -14,6 +14,7 @@ import { SortDropdown } from "../components/catalog/SortDropdown"
 import { ProductGrid } from "../components/product/ProductGrid"
 import { Drawer } from "../components/ui/drawer"
 import { AdjustmentsIcon } from "../components/icons"
+import { LinkComponent } from "../types"
 
 export interface CatalogViewProps {
   title?: string
@@ -27,7 +28,7 @@ export interface CatalogViewProps {
   routes: StoreRoutes
   capabilities?: StoreCapabilities
   breadcrumbs?: Array<{ label: string; href: string }>
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function CatalogView({

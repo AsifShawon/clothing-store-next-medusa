@@ -2,6 +2,7 @@ import React from "react"
 import Link from "next/link"
 import { ProductView, StoreCapabilities, StoreRoutes } from "@dtc/commerce-contracts"
 import { ProductCard } from "./ProductCard"
+import { LinkComponent } from "../../types"
 
 export interface ProductGridProps {
   products: ProductView[]
@@ -9,7 +10,7 @@ export interface ProductGridProps {
   capabilities?: StoreCapabilities
   emptyStateTitle?: string
   emptyStateMessage?: string
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function ProductGrid({

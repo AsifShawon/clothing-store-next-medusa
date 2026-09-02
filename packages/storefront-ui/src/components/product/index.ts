@@ -1,2 +1,7 @@
 export * from "./ProductCard"
 export * from "./ProductGrid"
+export * from "./ImageGallery"
+export * from "./ProductInfo"
+export * from "./VariantSelector"
+export * from "./SizeGuideModal"
+export * from "./ProductTabs"

@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import Link from "next/link"
 import { Drawer } from "../ui/drawer"
 import { MagnifyingGlassIcon, ShoppingBagIcon, UserIcon } from "../icons"
+import { LinkComponent } from "../../types"
 
 export interface MobileNavDrawerProps {
   isOpen: boolean
@@ -12,7 +13,7 @@ export interface MobileNavDrawerProps {
   cartHref?: string
   accountHref?: string
   bottomSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode; onClick?: () => void }>
+  linkComponent?: LinkComponent
 }
 
 export function MobileNavDrawer({

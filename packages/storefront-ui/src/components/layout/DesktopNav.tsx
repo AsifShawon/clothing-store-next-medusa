@@ -2,6 +2,8 @@ import React from "react"
 import Link from "next/link"
 import clsx from "clsx"
 
+import { LinkComponent } from "../../types"
+
 export interface NavLinkItem {
   label: string
   href: string
@@ -10,7 +12,7 @@ export interface NavLinkItem {
 
 export interface DesktopNavProps {
   links: NavLinkItem[]
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function DesktopNav({

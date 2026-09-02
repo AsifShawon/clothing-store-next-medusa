@@ -2,10 +2,13 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { StoreRoutes } from "@dtc/commerce-contracts"
+import { ArrowRightIcon } from "../icons"
+import { LinkComponent } from "../../types"
 
 export interface BrandStorySectionProps {
   routes: StoreRoutes
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  learnMoreHref?: string
+  linkComponent?: LinkComponent
 }
 
 export function BrandStorySection({

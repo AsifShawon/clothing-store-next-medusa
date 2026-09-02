@@ -3,13 +3,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { ProductView, StoreCapabilities } from "@dtc/commerce-contracts"
 import { COLOR_SWATCHES } from "../../theme/colors"
+import { LinkComponent } from "../../types"
 
 export interface ProductCardProps {
   product: ProductView
   href: string
   capabilities?: StoreCapabilities
   onQuickAdd?: (product: ProductView) => void
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
+  linkComponent?: LinkComponent
 }
 
 export function ProductCard({

@@ -2,12 +2,14 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ProductView, StoreRoutes } from "@dtc/commerce-contracts"
+import { ArrowRightIcon, SparklesIcon } from "../icons"
+import { LinkComponent } from "../../types"
 
 export interface HeroSectionProps {
   routes: StoreRoutes
   featuredProduct?: ProductView
   secondaryCtaSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function HeroSection({

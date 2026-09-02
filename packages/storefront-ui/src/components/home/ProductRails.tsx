@@ -2,6 +2,7 @@ import React from "react"
 import Link from "next/link"
 import { ProductView, StoreCapabilities, StoreRoutes } from "@dtc/commerce-contracts"
 import { ProductCard } from "../product/ProductCard"
+import { LinkComponent } from "../../types"
 
 export interface ProductRailsProps {
   title: string
@@ -11,7 +12,7 @@ export interface ProductRailsProps {
   products: ProductView[]
   routes: StoreRoutes
   capabilities?: StoreCapabilities
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children: React.ReactNode }>
+  linkComponent?: LinkComponent
 }
 
 export function ProductRails({

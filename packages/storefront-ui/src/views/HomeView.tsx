@@ -6,6 +6,7 @@ import { ProductRails } from "../components/home/ProductRails"
 import { BrandStorySection } from "../components/home/BrandStorySection"
 import { NewsletterSection } from "../components/home/NewsletterSection"
 import { DeliveryGuaranteesSection } from "../components/home/DeliveryGuaranteesSection"
+import { LinkComponent } from "../types"
 
 export interface HomeViewProps {
   heroProduct?: ProductView
@@ -15,7 +16,7 @@ export interface HomeViewProps {
   capabilities?: StoreCapabilities
   secondaryCtaSlot?: React.ReactNode
   newsletterSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
+  linkComponent?: LinkComponent
 }
 
 export function HomeView({
