@@ -1,0 +1,48 @@
+name: Quality & Storefront Validation
+
+on:
+  push:
+    branches: [main, refactor/*, feat/*]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Architecture, Type Check & Build Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Enable Corepack & Setup pnpm 10.11.1
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.11.1 --activate
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Monorepo Architecture & Shared UI
+        run: pnpm run check:architecture
+
+      - name: Type Check Workspace
+        run: pnpm run type-check
+
+      - name: Portfolio Demo Unit & Storage Lifecycle Tests
+        run: pnpm run demo:test
+
+      - name: Build Portfolio Demo (Static Export)
+        run: pnpm run demo:build
+
+      - name: Build Medusa Storefront (Next.js)
+        run: pnpm run --filter @dtc/storefront build
+        env:
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: pk_test_placeholder_key_for_ci
+          NEXT_PUBLIC_BASE_URL: http://localhost:8000
+          MEDUSA_BACKEND_URL: http://localhost:9000
