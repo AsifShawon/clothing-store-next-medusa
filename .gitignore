@@ -56,5 +56,6 @@ ehthumbs.db
 Thumbs.db
 **/.DS_Store
 *.tsbuildinfo
-test-results/
-test-results.json
+**/test-results/
+**/test-results.json
+**/.last-run.json

@@ -28,6 +28,7 @@ This repository enforces a strict **single customer-facing storefront UI impleme
             │ apps/storefront          │        │ apps/portfolio-demo      │
             │ (Medusa v2 Headless SSR) │        │ (Static HTML LocalStorage│
             │ Adapter: adapters/medusa │        │ Adapter: adapters/local  │
+            │ Presets: @dtc/storefront │        │ Presets: @dtc/storefront │
             └────────────┬─────────────┘        └──────────────────────────┘
                          │
             ┌────────────▼─────────────┐
@@ -48,67 +49,74 @@ This repository enforces a strict **single customer-facing storefront UI impleme
 - `DemoStoreContext`, `StorageRepository`, or demo state
 - Stripe SDKs (`@stripe/*`)
 - Backend environment variables (`MEDUSA_*`, `DATABASE_URL`, `REDIS_URL`, etc.)
+- Cross-app internal imports (`../../apps/storefront`, `../../apps/portfolio-demo`)
 
-Boundary compliance is verified by `scripts/check-package-boundaries.mjs` and the root command:
+Boundary compliance is verified by the automated verification suite:
 ```bash
+pnpm run check:architecture
 pnpm run check:boundaries
+pnpm run check:shared-ui
 ```
 
 ---
 
-## 4. Architectural Separation: Controllers vs Views
+## 4. Customer Experience Consumption Matrix
 
-Route files in each application act as **Controllers**:
-1. **Load data** from the provider (Medusa server fetch or LocalStorage hook).
-2. **Transform** provider data into shared contracts (`ProductView`, `CartView`, `CheckoutView`, `CustomerView`, `OrderView`).
-3. **Provide action callbacks** conforming to feature interfaces (`CartActions`, `CheckoutActions`, `CustomerActions`).
-4. **Render** the shared view from `@dtc/storefront-ui/views`, supplying capabilities and optional slots.
+Both the Medusa v2 Storefront and the Portfolio Demo consume the identical shared canonical views from `@dtc/storefront-ui`:
 
-### Example Controller Pattern
-```tsx
-// apps/storefront/src/app/[countryCode]/(main)/products/[handle]/page.tsx
-import { ProductDetailView } from "@dtc/storefront-ui/views"
-import { toProductView } from "@/adapters/medusa/catalog"
-import { listProducts } from "@lib/data/products"
+| Customer Experience | Shared Canonical View | Medusa Storefront Consumer | Portfolio Demo Consumer |
+| :--- | :--- | :--- | :--- |
+| **Homepage** | `HomeView` | `src/app/[countryCode]/(main)/page.tsx` | `src/app/page.tsx` |
+| **Catalog / Store** | `CatalogView` | `modules/store/components/catalog-client` | `src/app/shop/page.tsx` |
+| **Category View** | `CategoryView` | `modules/categories/components/category-client` | `src/app/category/page.tsx` |
+| **Collection View** | `CollectionView` | `modules/collections/components/collection-client`| `src/app/collection/page.tsx` |
+| **Product Detail** | `ProductDetailView` | `modules/products/components/product-detail-client` | `src/app/product/page.tsx` |
+| **Cart View** | `CartView` | `modules/cart/components/cart-client` | `src/app/cart/page.tsx` |
+| **Checkout Flow** | `CheckoutView` | `modules/checkout/components/checkout-client` | `src/app/checkout/page.tsx` |
+| **Order Completed**| `OrderConfirmationView` | `modules/order/components/order-completed-client` | `src/app/order/page.tsx` |
+| **Account Shell** | `AccountShell` | `modules/account/components/account-layout-client` | `src/app/account/page.tsx` |
+| **Account Overview** | `AccountOverview` | `modules/account/components/overview-client` | `src/app/account/page.tsx` |
+| **Account Orders** | `AccountOrders` | `modules/account/components/orders-client` | `src/app/account/orders/page.tsx` |
+| **Account Profile**| `AccountProfile` | `modules/account/components/profile-client` | `src/app/account/page.tsx` |
+| **Account Addresses**| `AccountAddresses` | `modules/account/components/addresses-client` | `src/app/account/page.tsx` |
+| **About Us** | `AboutView` | `src/app/[countryCode]/(main)/about/page.tsx` | `src/app/about/page.tsx` |
+| **Contact Atelier**| `ContactView` | `src/app/[countryCode]/(main)/contact/page.tsx` | `src/app/contact/page.tsx` |
+| **FAQ** | `FaqView` | `src/app/[countryCode]/(main)/faq/page.tsx` | `src/app/faq/page.tsx` |
+| **Size & Fit Guide**| `SizeGuideView` | `src/app/[countryCode]/(main)/size-guide/page.tsx` | `src/app/size-guide/page.tsx` |
+| **Shipping Policy**| `PolicyView` | `src/app/[countryCode]/(main)/shipping-policy/page.tsx` | `src/app/shipping-policy/page.tsx`|
+| **Return Policy** | `PolicyView` | `src/app/[countryCode]/(main)/return-policy/page.tsx` | `src/app/return-policy/page.tsx` |
+| **Privacy Policy** | `PolicyView` | `src/app/[countryCode]/(main)/privacy-policy/page.tsx` | `src/app/privacy-policy/page.tsx` |
+| **Terms & Conditions**| `PolicyView` | `src/app/[countryCode]/(main)/terms-and-conditions/page.tsx` | `src/app/terms-and-conditions/page.tsx` |
 
-export default async function ProductPage({ params }) {
-  const { handle, countryCode } = await params
-  const { response } = await listProducts({ countryCode, queryParams: { handle } })
-  const productView = toProductView(response.products[0])
+---
 
-  return (
-    <ProductDetailView
-      product={productView}
-      routes={medusaRoutes(countryCode)}
-      capabilities={medusaCapabilities}
-    />
-  )
-}
+## 5. Single Source of Truth Theme
+
+The design tokens and styles are defined canonically in `packages/storefront-ui`:
+1. **Tailwind Preset**: `packages/storefront-ui/tailwind.preset.js` is exported as `@dtc/storefront-ui/tailwind.preset`.
+   - Both `apps/storefront/tailwind.config.js` and `apps/portfolio-demo/tailwind.config.js` include it in their `presets` array.
+   - Eliminates duplicate color palettes (`brand`, `grey`), font families (`display`, `heading`, `sans`), responsive screens, border radiuses, and keyframe animations.
+2. **Canonical Stylesheet**: `packages/storefront-ui/src/styles/storefront.css` contains all base layers, typography utility classes (`text-small-semi`, `text-base-regular`), button variants (`contrast-btn`), and layout containers (`content-container`).
+   - Both apps import `@dtc/storefront-ui/styles/storefront.css` into their root `globals.css`.
+
+---
+
+## 6. Verification & Quality Gates
+
+Run the verification commands from the monorepo root:
+```bash
+# Architecture & boundary validation
+pnpm run check:architecture
+
+# Type check across all packages and apps
+pnpm run type-check
+
+# Portfolio demo storage, checkout & admin unit test suite
+pnpm run demo:test
+
+# Static export build for Portfolio Demo
+pnpm run demo:build
+
+# Next.js production build for Storefront
+pnpm run --filter @dtc/storefront build
 ```
-
----
-
-## 5. Slot Architecture for Intentional Differences
-
-Intentional demonstration features (such as Demo Admin links, reset demo data modals, simulated payment choices, and security notices) are injected via **slots** without branching shared UI code:
-
-| Slot Name | Medusa Storefront Behavior | Portfolio Demo Behavior |
-| :--- | :--- | :--- |
-| `demoNoticeSlot` | Null / unrendered | `<CheckoutNotice />` / Demo Banner |
-| `headerActionsSlot` | Currency badge (`🇧🇩 BDT (৳)`) | "Demo Admin" badge button |
-| `footerControlsSlot`| Currency badge | "Reset Demo Data" modal trigger |
-| `paymentSlot` | Real Stripe Elements / Manual payment | Simulated COD, Demo Card & Mobile Wallets |
-| `authNoticeSlot` | Standard password reset link | 1-Click "Continue as Demo Customer" button |
-| `orderActionsSlot` | Continue Shopping link | "Inspect in Demo Admin" button |
-
----
-
-## 6. Guide for Future Commerce Implementations
-
-To connect a future full-stack commerce engine (e.g. Next.js with Prisma / Drizzle / PostgreSQL):
-1. Create `apps/future-storefront` in Turborepo.
-2. Add workspace dependencies on `@dtc/commerce-contracts` and `@dtc/storefront-ui`.
-3. Create `src/adapters/db/` to map database queries to `ProductView`, `CartView`, etc.
-4. Implement `CartActions`, `CheckoutActions`, and `CustomerActions` using server actions or API routes.
-5. Define `StoreRoutes` for the application's URL schema.
-6. Render shared views from `@dtc/storefront-ui/views`. Zero customer-facing UI needs to be re-authored or copied.
