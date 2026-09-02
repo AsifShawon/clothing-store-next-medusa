@@ -42,8 +42,8 @@ export function LoginPrompt({
     setIsLoading(true)
     try {
       await onLogin(email, password)
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to sign in. Please verify your credentials.")
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Failed to sign in. Please verify your credentials.")
     } finally {
       setIsLoading(false)
     }
@@ -56,12 +56,13 @@ export function LoginPrompt({
     setIsLoading(true)
     try {
       await onRegister({ email, password, firstName, lastName, phone })
-    } catch (err: any) {
-      setErrorMessage(err.message || "Failed to create account.")
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Failed to create account.")
     } finally {
       setIsLoading(false)
     }
   }
+
 
   // Portfolio Demo Mode Login
   if (isSimulatedDemo) {

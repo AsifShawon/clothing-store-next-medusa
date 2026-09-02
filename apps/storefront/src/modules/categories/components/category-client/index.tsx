@@ -3,6 +3,7 @@
 import React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import {
+  CatalogSortOption,
   CategoryView as CategoryModel,
   DEFAULT_MEDUSA_CAPABILITIES,
   ProductFilterView,
@@ -11,6 +12,20 @@ import {
 import { CategoryView } from "@dtc/storefront-ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
+
+const VALID_SORTS: readonly CatalogSortOption[] = [
+  "featured",
+  "newest",
+  "price_asc",
+  "price_desc",
+  "created_at",
+]
+
+function toValidSort(val?: string): CatalogSortOption {
+  return VALID_SORTS.includes(val as CatalogSortOption)
+    ? (val as CatalogSortOption)
+    : "created_at"
+}
 
 interface MedusaCategoryClientProps {
   category: CategoryModel
@@ -34,9 +49,10 @@ export default function MedusaCategoryClient({
   const routes = createMedusaRoutes(countryCode)
 
   const filters: ProductFilterView = {
-    sortBy: (currentSortBy as any) || "created_at",
+    sortBy: toValidSort(currentSortBy),
     category: category.id,
   }
+
 
   const handleFilterChange = (newFilters: ProductFilterView) => {
     const params = new URLSearchParams(searchParams?.toString() || "")

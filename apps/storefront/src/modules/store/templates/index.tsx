@@ -1,5 +1,7 @@
+import { HttpTypes } from "@medusajs/types"
 import { OptionValueIds } from "@lib/util/product-option-filters"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+
 import { listProductsWithSort } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
 import { toCategoryView, toProductView } from "../../../adapters/medusa/catalog"
@@ -23,9 +25,10 @@ const StoreTemplate = async ({
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
 
-  const queryParams: Record<string, any> = {
+  const queryParams: HttpTypes.FindParams & Record<string, unknown> = {
     limit: PRODUCT_LIMIT,
   }
+
 
   if (q) {
     queryParams["q"] = q

@@ -2,7 +2,7 @@
 
 import React from "react"
 import { useRouter } from "next/navigation"
-import { CustomerView } from "@dtc/commerce-contracts"
+import { AddressFormView, CustomerView } from "@dtc/commerce-contracts"
 import { AccountAddresses } from "@dtc/storefront-ui"
 import { addCustomerAddress, deleteCustomerAddress } from "@lib/data/customer"
 
@@ -17,8 +17,9 @@ export default function MedusaAddressesClient({
 }: MedusaAddressesClientProps) {
   const router = useRouter()
 
-  const handleSaveAddress = async (address: any) => {
+  const handleSaveAddress = async (address: AddressFormView) => {
     const formData = new FormData()
+
     formData.append("first_name", address.firstName)
     formData.append("last_name", address.lastName)
     formData.append("phone", address.phone || "")

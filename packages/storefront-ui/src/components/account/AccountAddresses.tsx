@@ -1,16 +1,17 @@
 "use client"
 
 import React, { useState } from "react"
-import { CustomerAddressView, CustomerView } from "@dtc/commerce-contracts"
+import { AddressFormView, CustomerAddressView, CustomerView } from "@dtc/commerce-contracts"
 import { MapPinIcon, PlusIcon, TrashIcon } from "../icons"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 
 export interface AccountAddressesProps {
   customer: CustomerView
-  onSaveAddress?: (address: any) => Promise<void> | void
+  onSaveAddress?: (address: AddressFormView) => Promise<void> | void
   onDeleteAddress?: (id: string) => Promise<void> | void
 }
+
 
 export function AccountAddresses({
   customer,

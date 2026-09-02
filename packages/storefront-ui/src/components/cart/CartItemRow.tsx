@@ -3,12 +3,14 @@
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { CartItemView } from "@dtc/commerce-contracts"
+import { CartItemView, OrderLineView } from "@dtc/commerce-contracts"
 import { TrashIcon } from "../icons"
 import { LinkComponent } from "../../types"
 
+export type DisplayItemView = CartItemView | OrderLineView
+
 export interface CartItemRowProps {
-  item: CartItemView
+  item: DisplayItemView
   onUpdateQuantity?: (qty: number) => void
   onRemove?: () => void
   disabled?: boolean
@@ -24,8 +26,9 @@ export function CartItemRow({
   linkComponent: LinkComp = Link,
   productHref,
 }: CartItemRowProps) {
-  const title = item.title || (item as any).productTitle || "Garment"
+  const title = ("title" in item && item.title) ? item.title : (item.productTitle || "Garment")
   const href = productHref || (item.productHandle ? `/products/${item.productHandle}` : undefined)
+
 
   return (
     <div className="py-4 sm:py-6 border-b border-brand-border flex gap-4 sm:gap-6 items-start">
@@ -71,9 +74,9 @@ export function CartItemRow({
                 title
               )}
             </h4>
-            {(item.variantTitle || item.subtitle) && (
+            {(item.variantTitle || ("subtitle" in item && item.subtitle)) && (
               <p className="text-xs text-brand-muted font-medium">
-                {item.variantTitle || item.subtitle}
+                {item.variantTitle || ("subtitle" in item ? item.subtitle : undefined)}
               </p>
             )}
           </div>
@@ -83,7 +86,7 @@ export function CartItemRow({
             <span className="font-heading font-bold text-sm text-brand-primary">
               {item.totalPrice.formatted}
             </span>
-            {item.originalTotalPrice && (
+            {("originalTotalPrice" in item && item.originalTotalPrice) && (
               <p className="text-xs text-brand-muted line-through font-mono">
                 {item.originalTotalPrice.formatted}
               </p>

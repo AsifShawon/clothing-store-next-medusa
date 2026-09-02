@@ -48,11 +48,12 @@ export function OrderSummary({
       if (result !== false) {
         setInputCode("")
       }
-    } catch (err: any) {
-      setLocalError(err.message || "Failed to apply promotional code")
+    } catch (err: unknown) {
+      setLocalError(err instanceof Error ? err.message : "Failed to apply promotional code")
     } finally {
       setIsLoadingPromo(false)
     }
+
   }
 
   const activeError = promoError || localError

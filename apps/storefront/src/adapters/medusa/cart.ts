@@ -1,6 +1,5 @@
 import {
   AddressFormView,
-  AddressView,
   CartItemView,
   CartLineView,
   CartTotalsView,
@@ -76,7 +75,7 @@ export function toCartView(cart: HttpTypes.StoreCart): CartView {
   const totals = toCartTotalsView(cart, currencyCode)
 
   const appliedPromotions: PromotionView[] = (cart.promotions || []).map((p) => {
-    const promo = p as any
+    const promo = p as HttpTypes.StorePromotion & { application_method?: { description?: string } }
     return {
       id: promo.id,
       code: promo.code || "PROMO",
@@ -120,14 +119,14 @@ export function toAddressFormView(address?: HttpTypes.StoreCartAddress | null): 
     city: address?.city || "Dhaka",
     postalCode: address?.postal_code || "",
     province: address?.province || "",
-    country: address?.country_code || "Bangladesh",
+    country: address?.country_code?.toLowerCase() || "bd",
     phone: address?.phone || "",
   }
 }
 
 export function toOrderView(order: HttpTypes.StoreOrder): OrderView {
   const currencyCode = order.currency_code || "bdt"
-  const items: OrderLineView[] = (order.items || []).map((item: any) => ({
+  const items: OrderLineView[] = (order.items || []).map((item: HttpTypes.StoreOrderLineItem) => ({
     id: item.id,
     productId: item.product_id || "",
     productTitle: item.product_title || item.title || "Garment",
@@ -138,6 +137,7 @@ export function toOrderView(order: HttpTypes.StoreOrder): OrderView {
       ? {
           id: `${item.id}-thumb`,
           url: item.thumbnail,
+
           altText: item.title || "Garment",
         }
       : undefined,
@@ -181,8 +181,9 @@ export function toOrderView(order: HttpTypes.StoreOrder): OrderView {
     displayId: String(order.display_id ?? order.id),
     status: orderStatusMap[order.status] || "processing",
     paymentStatus: paymentStatusMap[order.payment_status] || "captured",
-    fulfillmentStatus: (order as any).fulfillment_status || "confirmed",
+    fulfillmentStatus: (order as unknown as { fulfillment_status?: string }).fulfillment_status || "confirmed",
     createdAt:
+
       typeof order.created_at === "string"
         ? order.created_at
         : new Date(order.created_at).toISOString(),

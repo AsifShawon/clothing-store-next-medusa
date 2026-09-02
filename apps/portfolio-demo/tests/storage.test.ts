@@ -152,7 +152,7 @@ describe("London Boy Portfolio Demo Storage Engine & Catalog Tests", () => {
 
   test("5. Corrupted JSON recovery handles invalid storage gracefully", () => {
     mockStorage.setItem(STORAGE_KEY, "{ broken_invalid_json_data [")
-    
+
     // Should safely catch parse error and recover to valid initial seed
     const state = demoStorage.initializeState()
     assert.ok(state)

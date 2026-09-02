@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { CustomerView, OrderView, StoreRoutes } from "@dtc/commerce-contracts"
+import { CustomerView, OrderView, RegisterFormData, StoreRoutes } from "@dtc/commerce-contracts"
 import { AccountShell } from "../components/account/AccountShell"
 import { AccountOverview } from "../components/account/AccountOverview"
 import { LoginPrompt } from "../components/account/LoginPrompt"
@@ -14,7 +14,8 @@ export interface AccountViewProps {
   isSimulatedDemo?: boolean
   onDemoLogin?: () => void
   onLogin?: (email: string, pass: string) => Promise<void> | void
-  onRegister?: (data: any) => Promise<void> | void
+  onRegister?: (data: RegisterFormData) => Promise<void> | void
+
   onLogout?: () => void | Promise<void>
   recentOrders?: OrderView[]
   routes: StoreRoutes

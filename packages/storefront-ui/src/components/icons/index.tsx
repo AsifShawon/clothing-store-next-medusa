@@ -238,4 +238,3 @@ export function SignOutIcon({ size = 16, className = "w-4 h-4", ...props }: Icon
     </svg>
   )
 }
-

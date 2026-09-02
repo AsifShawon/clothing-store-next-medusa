@@ -12,6 +12,8 @@ import { applyPromotions, deleteLineItem, updateLineItem } from "@lib/data/cart"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
+import { getErrorMessage } from "@lib/util/get-error-message"
+
 interface MedusaCartClientProps {
   cart: CartModel | null
 }
@@ -28,8 +30,8 @@ export default function MedusaCartClient({ cart }: MedusaCartClientProps) {
     try {
       await updateLineItem({ lineId, quantity })
       router.refresh()
-    } catch (error: any) {
-      console.error("Error updating quantity:", error)
+    } catch (error: unknown) {
+      console.error("Error updating quantity:", getErrorMessage(error))
     }
   }
 
@@ -37,8 +39,8 @@ export default function MedusaCartClient({ cart }: MedusaCartClientProps) {
     try {
       await deleteLineItem(lineId)
       router.refresh()
-    } catch (error: any) {
-      console.error("Error removing item:", error)
+    } catch (error: unknown) {
+      console.error("Error removing item:", getErrorMessage(error))
     }
   }
 
@@ -48,11 +50,12 @@ export default function MedusaCartClient({ cart }: MedusaCartClientProps) {
       await applyPromotions([code])
       router.refresh()
       return true
-    } catch (error: any) {
-      setPromoError(error?.message || "Invalid promotional code")
+    } catch (error: unknown) {
+      setPromoError(getErrorMessage(error))
       return false
     }
   }
+
 
   const resolvedCart: CartModel = cart || {
     id: "empty",

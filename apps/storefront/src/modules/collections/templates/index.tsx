@@ -3,8 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 import { OptionValueIds } from "@lib/util/product-option-filters"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { listProductsWithSort } from "@lib/data/products"
-import { listCategories } from "@lib/data/categories"
-import { toCategoryView, toCollectionView, toProductView } from "../../../adapters/medusa/catalog"
+import { toCollectionView, toProductView } from "../../../adapters/medusa/catalog"
 import MedusaCollectionClient from "../components/collection-client"
 
 const PRODUCT_LIMIT = 24
@@ -27,7 +26,7 @@ export default async function CollectionTemplate({
 
   if (!collection || !countryCode) notFound()
 
-  const queryParams: Record<string, any> = {
+  const queryParams: HttpTypes.FindParams & Record<string, unknown> = {
     limit: PRODUCT_LIMIT,
     collection_id: [collection.id],
   }
@@ -36,21 +35,19 @@ export default async function CollectionTemplate({
     queryParams["order"] = "created_at"
   }
 
-  const [{ response }, allCategories] = await Promise.all([
-    listProductsWithSort({
-      page: pageNumber,
-      queryParams,
-      sortBy: sort,
-      countryCode,
-      optionValueIds,
-    }),
-    listCategories().catch(() => []),
-  ])
+  const { response } = await listProductsWithSort({
+    page: pageNumber,
+    queryParams,
+    sortBy: sort,
+    countryCode,
+    optionValueIds,
+  })
 
   const productViews = (response.products || []).map((p) => toProductView(p, "bdt"))
-  const categoryViews = (allCategories || []).map(toCategoryView)
+
 
   return (
+
     <MedusaCollectionClient
       collection={toCollectionView(collection)}
       products={productViews}

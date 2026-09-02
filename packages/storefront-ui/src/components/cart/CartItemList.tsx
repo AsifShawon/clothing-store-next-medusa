@@ -4,14 +4,19 @@ import { CartItemView, OrderLineView } from "@dtc/commerce-contracts"
 import { CartItemRow } from "./CartItemRow"
 import { LinkComponent } from "../../types"
 
+import { DisplayItemView } from "./CartItemRow"
+
 export interface CartItemListProps {
-  items: Array<CartItemView | OrderLineView | any>
+  items: DisplayItemView[]
   onUpdateQuantity?: (id: string, qty: number) => void
   onRemoveItem?: (id: string) => void
   disabled?: boolean
   linkComponent?: LinkComponent
-  getItemHref?: (item: any) => string
+  getItemHref?: (item: DisplayItemView) => string
 }
+
+
+
 
 export function CartItemList({
   items,
