@@ -87,7 +87,34 @@ Production-Ready Single-Brand Clothing Ecommerce Platform on Medusa v2 & Next.js
 - [x] Medusa event subscribers for `order.placed` and `auth.password_reset`.
 - [x] Automated test suite verifying customer auth, addresses, password reset, email templates, and file uploads (`tests/automated-accounts-email-media.mjs`).
 
-### Milestone 6: Production Dockerization, Reverse Proxy & VPS Deployment
+### Milestone 6: Browser-Only Portfolio Demonstration (`apps/portfolio-demo`) (Completed)
+- [x] Dedicated Next.js 15 static export application (`apps/portfolio-demo`) with zero external backend dependencies.
+- [x] Browser-only simulated commerce engine using versioned LocalStorage (`london-boy:portfolio-demo:v1`).
+- [x] Initial seed state containing 6 authentic London Boy garments and 38 variants matching Medusa seed script.
+- [x] 30 static routes covering Storefront (catalog, PDP, collections, categories, cart, checkout, order receipt, customer account portal, policies) and Demo Admin (dashboard, products, editor, orders, order detail, customers, promotions, settings).
+- [x] Instant client-side search modal (`SearchModal`) and desktop/mobile faceted filtering (`FilterSidebar`, `MobileFilterDrawer`).
+- [x] Dynamic PDP gallery, variant selector, measurement guide modal (`SizeGuideModal`), and tabbed specifications.
+- [x] 5-step browser checkout pipeline with permanent demo security notice, 1-click Demo Customer login, Cash on Delivery, and simulated payment modes (Demo Card approval/failure and Mobile Banking wallets).
+- [x] Order receipt page with fulfillment stepper, line breakdowns, and direct links to Demo Admin.
+- [x] Customer account portal with profile editing, lifetime metrics, order history, and cross-customer authorization isolation.
+- [x] Polished, clearly labeled Demo Admin (`/demo-admin`, `/demo-admin/products`, `/demo-admin/product`, `/demo-admin/orders`, `/demo-admin/order`, `/demo-admin/customers`, `/demo-admin/promotions`, `/demo-admin/settings`).
+- [x] Prominent notice: "Demo Admin — changes are stored only in this browser."
+- [x] Product CRUD with handle/SKU uniqueness validation, zero-negative constraints, dynamic variant matrix, and deep storefront preview.
+- [x] Order management with courier tracking assignment (`Pathao`, `Steadfast`), cancellation with single-inventory restoral protection, and simulated refund.
+- [x] Customer CRM with lifetime spend tracking and safe profile editor.
+- [x] Promotions manager with unique code validator, percentage/fixed discounts, and instant cart recalculation.
+- [x] Settings with store metadata, storage byte calculator, JSON backup export/import, and two-step reset modal (requiring typing "RESET DEMO").
+- [x] Automated test suites covering storage engine resilience, checkout/order lifecycles, and full admin operations (27/27 tests passing).
+- [x] Hardening for static hosting (`output: "export"`, `trailingSlash: true`, `images.unoptimized: true`).
+- [x] Comprehensive Playwright test suite (64/64 tests passing across Chromium, Firefox, WebKit, and Mobile Chrome).
+- [x] Strict network isolation and zero-error diagnostic assertions (preventing localhost:9000 leaks, broken assets, and unhandled exceptions).
+- [x] Automated launch report generator (`pnpm --filter @dtc/portfolio-demo run report:launch`) outputting to `docs/portfolio-demo-launch-report.md`.
+- [x] Filtered Turbo scripts (`demo:dev`, `demo:build`, `demo:lint`, `demo:test`).
+
+### Milestone 7: Production Dockerization, Reverse Proxy & VPS Deployment (Deferred)
+> [!NOTE]
+> The production VPS deployment milestone is deferred for future production hosting. The full-stack Medusa v2 backend (`apps/backend`) and real Next.js storefront (`apps/storefront`) remain fully operational and preserved in this monorepo without modification.
+
 - [ ] Multi-stage production Dockerfiles for Backend and Next.js Storefront.
 - [ ] Production `docker-compose.prod.yml` with healthchecks and restart policies.
 - [ ] Reverse proxy (Caddy / Nginx) with automatic SSL certificate management.
@@ -107,21 +134,14 @@ Production-Ready Single-Brand Clothing Ecommerce Platform on Medusa v2 & Next.js
 | Bangladesh Region | `http://localhost:9000/store/regions` | 200 OK (`bd`, `bdt`) | 2026-09-01 | Single region: Bangladesh |
 | Storefront Home | `http://localhost:8000/bd` | 200 OK | 2026-09-01 | Hero, Categories, Rails, Story, Newsletter |
 | Store Catalog | `http://localhost:8000/bd/store` | 200 OK | 2026-09-01 | Keyword search, sorting, filter options |
-| Collection Page | `http://localhost:8000/bd/collections/essentials` | 200 OK | 2026-09-01 | Filtered collection products |
-| Product Detail Page | `http://localhost:8000/bd/products/heavyweight-t-shirt` | 200 OK | 2026-09-01 | 8 variants, Size Guide, Stock quantity, Add to Cart |
-| About Page | `http://localhost:8000/bd/about` | 200 OK | 2026-09-01 | Brand origins & fabric standards |
-| Contact Page | `http://localhost:8000/bd/contact` | 200 OK | 2026-09-01 | Customer care form & Dhaka office |
-| Shipping Policy | `http://localhost:8000/bd/shipping-policy` | 200 OK | 2026-09-01 | 60/100/130 BDT rates & timelines |
-| Return Policy | `http://localhost:8000/bd/return-policy` | 200 OK | 2026-09-01 | 24-hour return policy & steps |
-| Privacy Policy | `http://localhost:8000/bd/privacy-policy` | 200 OK | 2026-09-01 | Customer data security |
-| Terms & Conditions | `http://localhost:8000/bd/terms-and-conditions` | 200 OK | 2026-09-01 | Legal store terms & COD terms |
 | Shopping Bag / Cart | `http://localhost:8000/bd/cart` | 200 OK | 2026-09-01 | Responsive cart summary in BDT |
-| Branded 404 State | `http://localhost:8000/bd/non-existent-route` | 404 Page Not Found | 2026-09-01 | Custom London Boy 404 with store links |
-| Workspace Linter | `pnpm run lint` | 0 Errors | 2026-09-01 | Turbo lint across backend & storefront |
+| Workspace Linter | `pnpm run lint` | 0 Errors | 2026-09-02 | Turbo lint across backend, storefront & demo |
 | Storefront Build | `pnpm --filter @dtc/storefront build` | 0 Errors | 2026-09-01 | 23 static & dynamic routes compiled |
-| Automated Cart & Checkout Suite | `node tests/automated-cart-checkout.mjs` | All 7 Tests Passed | 2026-09-01 | Variant add, Qty update, Remove item, Invalid promo reject, Checkout completion, Admin order check, Inventory reserve |
-| Automated Stripe & Payment Suite | `node tests/automated-stripe-payment.mjs` | All 8 Tests Passed | 2026-09-01 | Successful payment, Declined card error, Retry on preserved cart, Refresh session recovery, Webhook signature check, Idempotency, Admin status, Single inventory deduction |
-| Automated Accounts, Email & Media Suite | `node --experimental-strip-types tests/automated-accounts-email-media.mjs` | All 8 Tests Passed | 2026-09-01 | Customer registration, Login & JWT session, Authorization isolation (401), Address book CRUD, Profile updates, Password reset, Branded email generation (order/reset/verify), File Module upload |
+| Portfolio Demo Tests | `pnpm --filter @dtc/portfolio-demo test` | 27 Tests Passed | 2026-09-02 | Storage validation, corruption repair, checkout, customer, inventory restoral, SKU validation, admin operations |
+| Portfolio Demo E2E | `pnpm --filter @dtc/portfolio-demo test:e2e` | 64 Tests Passed | 2026-09-02 | 16/16 tests passing across Chromium, Firefox, WebKit & Mobile Chrome |
+| Portfolio Demo Build | `pnpm run demo:build` | 30 Static Routes | 2026-09-02 | Static HTML export generated in `apps/portfolio-demo/out` |
+| Demo Launch Report | `pnpm --filter @dtc/portfolio-demo report:launch` | Certified Ready | 2026-09-02 | Generated at `docs/portfolio-demo-launch-report.md` |
+
 
 
 
