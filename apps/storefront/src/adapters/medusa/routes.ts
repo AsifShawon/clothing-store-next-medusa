@@ -5,8 +5,13 @@ export function createMedusaRoutes(countryCode: string = "bd"): StoreRoutes {
   return {
     home: () => prefix,
     catalog: (params) => {
-      const q = params?.q ? `?q=${encodeURIComponent(params.q)}` : ""
-      return `${prefix}/store${q}`
+      const searchParams = new URLSearchParams()
+      if (params?.q) searchParams.set("q", params.q)
+      if (params?.category) searchParams.set("category", params.category)
+      if (params?.collection) searchParams.set("collection", params.collection)
+      if (params?.sortBy) searchParams.set("sortBy", params.sortBy)
+      const qs = searchParams.toString()
+      return qs ? `${prefix}/store?${qs}` : `${prefix}/store`
     },
     product: (handle) => `${prefix}/products/${handle}`,
     category: (handle) => `${prefix}/categories/${handle}`,

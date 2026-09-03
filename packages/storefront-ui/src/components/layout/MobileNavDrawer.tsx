@@ -113,8 +113,8 @@ export function MobileNavDrawer({
                                   {group.title}
                                 </span>
                                 <ul className="space-y-1">
-                                  {group.links.map((sublink) => (
-                                    <li key={sublink.href}>
+                                  {group.links.map((sublink, sIdx) => (
+                                    <li key={`mob-${item.id}-${group.title}-${sIdx}-${sublink.label}`}>
                                       <LinkComp
                                         href={sublink.href}
                                         onClick={onClose}

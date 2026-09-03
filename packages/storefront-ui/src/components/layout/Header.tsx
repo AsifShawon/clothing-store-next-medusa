@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useRef, useState, useEffect } from "react"
 import Link from "next/link"
 import { BarsThreeIcon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon } from "../icons"
 import { DesktopNav, NavLinkItem } from "./DesktopNav"
@@ -45,8 +45,26 @@ export function Header({
   ],
   linkComponent: LinkComp = Link,
 }: HeaderProps) {
+  const headerRef = useRef<HTMLElement>(null)
+  const [headerBottom, setHeaderBottom] = useState<number>(160)
+
+  useEffect(() => {
+    const updateHeaderBottom = () => {
+      if (headerRef.current) {
+        setHeaderBottom(headerRef.current.getBoundingClientRect().bottom)
+      }
+    }
+    updateHeaderBottom()
+    window.addEventListener("resize", updateHeaderBottom)
+    window.addEventListener("scroll", updateHeaderBottom, { passive: true })
+    return () => {
+      window.removeEventListener("resize", updateHeaderBottom)
+      window.removeEventListener("scroll", updateHeaderBottom)
+    }
+  }, [])
+
   return (
-    <header className="relative z-40 bg-white border-b border-brand-border/80 transition-all duration-200">
+    <header ref={headerRef} className="relative z-40 bg-white border-b border-brand-border/80 transition-all duration-200">
       {/* 1. Slim Announcement Bar */}
       {announcementText && (
         <div className="bg-brand-primary text-brand-secondary text-[11px] font-heading font-medium tracking-wide py-2 px-4 text-center border-b border-white/10">
@@ -172,6 +190,7 @@ export function Header({
           items={navItems}
           links={navLinks}
           linkComponent={LinkComp}
+          backdropTop={headerBottom}
         />
       </div>
     </header>

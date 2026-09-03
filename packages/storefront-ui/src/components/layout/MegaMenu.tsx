@@ -50,7 +50,7 @@ export function MegaMenu({
       ref={panelRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 right-0 z-40 bg-white border-b border-brand-border/80 shadow-mega animate-mega-enter"
+      className="absolute top-full left-0 right-0 z-40 bg-white border-b border-brand-border/80 shadow-mega animate-mega-enter before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
     >
       <div className="content-container py-8 lg:py-10">
         <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -60,8 +60,8 @@ export function MegaMenu({
               Featured
             </span>
             <ul className="space-y-2">
-              {item.featuredLinks.map((link) => (
-                <li key={link.href}>
+              {item.featuredLinks.map((link, idx) => (
+                <li key={`${item.id}-feat-${idx}-${link.label}`}>
                   <LinkComp
                     href={link.href}
                     onClick={() => onClose()}
@@ -98,8 +98,8 @@ export function MegaMenu({
                   {group.title}
                 </span>
                 <ul className="space-y-2">
-                  {group.links.map((link) => (
-                    <li key={link.href}>
+                  {group.links.map((link, idx) => (
+                    <li key={`${item.id}-${group.title}-${idx}-${link.label}`}>
                       <LinkComp
                         href={link.href}
                         onClick={() => onClose()}
@@ -116,38 +116,38 @@ export function MegaMenu({
 
           {/* Column 4: Editorial Showcase Card */}
           <div className="col-span-4">
-            {item.editorialCards.slice(0, 1).map((card) => (
+            {item.editorialCards.slice(0, 1).map((card, idx) => (
               <div
-                key={card.title}
-                className="group relative overflow-hidden rounded-xl border border-brand-border/70 bg-brand-secondary aspect-[16/10] flex flex-col justify-end p-5 text-white shadow-subtle"
+                key={`${item.id}-card-${idx}-${card.title}`}
+                className="group relative overflow-hidden rounded-2xl border border-brand-border/70 aspect-[4/3] bg-brand-surface shadow-subtle hover:shadow-editorial transition-all duration-300 flex flex-col justify-end p-6"
               >
                 <Image
                   src={card.image}
                   alt={card.imageAlt || card.title}
                   fill
                   sizes="400px"
-                  className="object-cover object-center group-hover:scale-102 transition-transform duration-700"
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
 
-                <div className="relative z-10 space-y-1.5">
+                <div className="relative z-10 space-y-2 text-white">
                   <span className="text-[10px] font-heading font-bold uppercase tracking-widest text-brand-sand">
-                    Featured Editorial
+                    Curated Spotlight
                   </span>
-                  <h4 className="font-heading font-bold text-sm tracking-tight text-white">
+                  <h4 className="font-display text-lg text-white font-normal leading-snug">
                     {card.title}
                   </h4>
-                  <p className="text-[11px] text-white/80 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-brand-sand/90 line-clamp-2 leading-relaxed">
                     {card.description}
                   </p>
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <LinkComp
                       href={card.href}
                       onClick={() => onClose()}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white text-brand-primary hover:bg-brand-secondary text-[11px] font-heading font-bold uppercase tracking-wider transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-brand-primary text-xs font-heading font-bold uppercase tracking-wider hover:bg-brand-secondary transition-colors"
                     >
                       <span>{card.ctaText}</span>
-                      <ArrowRightIcon className="w-3 h-3 text-brand-primary" />
+                      <ArrowRightIcon className="w-3 h-3" />
                     </LinkComp>
                   </div>
                 </div>

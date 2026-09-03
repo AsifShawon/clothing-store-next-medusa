@@ -110,13 +110,13 @@ export function createStoreNavigation(routes: StoreRoutes): MegaNavItem[] {
     {
       id: "polos-tees",
       label: "Polos & Tees",
-      href: routes.catalog(),
+      href: routes.catalog({ category: "polos" }),
       shopAllHref: routes.catalog(),
       shopAllLabel: "Shop All Polos & Tees",
       featuredLinks: [
         { label: "240 GSM Heavyweight Tee", href: routes.product("heavyweight-t-shirt"), badge: "Bestseller" },
         { label: "Regent Mercerized Pique Polo", href: routes.product("regent-knit-polo") },
-        { label: "Minimal Crewneck Basics", href: routes.catalog() },
+        { label: "Minimal Crewneck Basics", href: routes.collection("essentials") },
       ],
       categoryGroups: [
         {
@@ -149,27 +149,27 @@ export function createStoreNavigation(routes: StoreRoutes): MegaNavItem[] {
     {
       id: "trousers",
       label: "Trousers",
-      href: routes.catalog(),
-      shopAllHref: routes.catalog(),
+      href: routes.catalog({ category: "chinos" }),
+      shopAllHref: routes.catalog({ category: "chinos" }),
       shopAllLabel: "Shop All Trousers",
       featuredLinks: [
         { label: "Mayfair Tailored Chinos", href: routes.product("mayfair-tailored-chinos"), badge: "Essential" },
-        { label: "Stretch Twill Bottoms", href: routes.catalog() },
-        { label: "Smart Tapered Fits", href: routes.catalog() },
+        { label: "Stretch Twill Bottoms", href: routes.catalog({ category: "chinos" }) },
+        { label: "Smart Tapered Fits", href: routes.collection("essentials") },
       ],
       categoryGroups: [
         {
           title: "Styles & Cuts",
           links: [
             { label: "Mayfair Tapered Chinos", href: routes.product("mayfair-tailored-chinos") },
-            { label: "Slim-Straight Everyday Twill", href: routes.catalog() },
+            { label: "Slim-Straight Everyday Twill", href: routes.catalog({ category: "chinos" }) },
           ],
         },
         {
           title: "Color Palette",
           links: [
             { label: "Classic British Khaki", href: routes.product("mayfair-tailored-chinos") },
-            { label: "Deep Charcoal Twill", href: routes.product("mayfair-tailored-chinos") },
+            { label: "Deep Charcoal Twill", href: routes.catalog({ category: "chinos" }) },
           ],
         },
       ],
@@ -200,7 +200,7 @@ export function createStoreNavigation(routes: StoreRoutes): MegaNavItem[] {
           title: "Seasonal Edits",
           links: [
             { label: "Chelsea Relaxed Linen Shirt", href: routes.product("chelsea-relaxed-linen-shirt") },
-            { label: "Relaxed Boxy Camp Collars", href: routes.product("chelsea-relaxed-linen-shirt") },
+            { label: "Relaxed Boxy Camp Collars", href: routes.catalog({ category: "shirts" }) },
             { label: "French Flax Earth Tones", href: routes.category("women") },
           ],
         },
@@ -224,7 +224,7 @@ export function createStoreNavigation(routes: StoreRoutes): MegaNavItem[] {
       shopAllLabel: "Shop All Accessories",
       featuredLinks: [
         { label: "Soho Brushed Twill Cap", href: routes.product("soho-cotton-twill-cap"), badge: "Signature" },
-        { label: "Antique Brass Hardware", href: routes.product("soho-cotton-twill-cap") },
+        { label: "Antique Brass Hardware", href: routes.category("accessories") },
         { label: "Full Accessories Range", href: routes.category("accessories") },
       ],
       categoryGroups: [
@@ -232,7 +232,7 @@ export function createStoreNavigation(routes: StoreRoutes): MegaNavItem[] {
           title: "Curated Accents",
           links: [
             { label: "6-Panel Twill Cap in Black", href: routes.product("soho-cotton-twill-cap") },
-            { label: "6-Panel Twill Cap in Forest Green", href: routes.product("soho-cotton-twill-cap") },
+            { label: "Caps & Headwear Edit", href: routes.category("accessories") },
           ],
         },
       ],

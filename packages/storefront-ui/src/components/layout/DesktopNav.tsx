@@ -19,6 +19,7 @@ export interface DesktopNavProps {
   linkComponent?: LinkComponent
   activeMenuId?: string | null
   onMenuChange?: (id: string | null) => void
+  backdropTop?: number
 }
 
 export function DesktopNav({
@@ -27,6 +28,7 @@ export function DesktopNav({
   linkComponent: LinkComp = Link,
   activeMenuId: controlledActiveId,
   onMenuChange,
+  backdropTop,
 }: DesktopNavProps) {
   const [internalActiveId, setInternalActiveId] = useState<string | null>(null)
   const isControlled = controlledActiveId !== undefined
@@ -64,16 +66,20 @@ export function DesktopNav({
 
     // If another menu is already open, switch immediately without delay
     if (activeId !== null) {
+      if (openTimerRef.current) {
+        clearTimeout(openTimerRef.current)
+        openTimerRef.current = null
+      }
       setActiveId(id)
       return
     }
 
-    // Otherwise use a 320ms hover-intent delay
+    // Snappy 120ms hover-intent delay (prevents accidental trigger on swift mouse sweeps)
     if (openTimerRef.current) clearTimeout(openTimerRef.current)
     openTimerRef.current = setTimeout(() => {
       setActiveId(id)
       openTimerRef.current = null
-    }, 320)
+    }, 120)
   }
 
   const handleTriggerMouseLeave = () => {
@@ -82,12 +88,12 @@ export function DesktopNav({
       openTimerRef.current = null
     }
 
-    // 180ms close grace period for diagonal pointer movement into the panel
+    // 280ms close grace period for diagonal pointer movement into the panel
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
     closeTimerRef.current = setTimeout(() => {
       setActiveId(null)
       closeTimerRef.current = null
-    }, 180)
+    }, 280)
   }
 
   const handlePanelMouseEnter = () => {
@@ -102,7 +108,7 @@ export function DesktopNav({
     closeTimerRef.current = setTimeout(() => {
       setActiveId(null)
       closeTimerRef.current = null
-    }, 180)
+    }, 280)
   }
 
   const handleTriggerClick = (e: React.MouseEvent, item: MegaNavItem) => {
@@ -159,7 +165,7 @@ export function DesktopNav({
       <>
         <nav
           aria-label="Main category navigation"
-          className="hidden lg:flex items-center gap-x-6 xl:gap-x-8 text-xs font-heading font-semibold uppercase tracking-wider"
+          className="hidden lg:flex items-center h-full gap-x-6 xl:gap-x-8 text-xs font-heading font-semibold uppercase tracking-wider"
         >
           {items.map((item) => {
             const isMenuOpen = activeId === item.id
@@ -182,7 +188,7 @@ export function DesktopNav({
                   aria-controls={`mega-menu-panel-${item.id}`}
                   aria-haspopup="true"
                   className={clsx(
-                    "py-3 transition-colors duration-150 border-b-2 flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
+                    "h-full flex items-center px-1 border-b-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
                     isMenuOpen
                       ? "text-brand-accent border-brand-accent"
                       : item.isActive
@@ -197,10 +203,11 @@ export function DesktopNav({
           })}
         </nav>
 
-        {/* Backdrop for open panel */}
+        {/* Backdrop for open panel - starts below header to never overlap navbar links */}
         {activeId && (
           <div
-            className="fixed inset-0 top-[116px] sm:top-[128px] bg-black/40 backdrop-blur-2xs z-30 transition-opacity duration-200"
+            className="fixed inset-x-0 bottom-0 bg-black/40 backdrop-blur-2xs z-30 transition-opacity duration-200"
+            style={{ top: backdropTop ? `${backdropTop}px` : "160px" }}
             onClick={() => handleClosePanel()}
             aria-hidden="true"
           />
@@ -224,13 +231,13 @@ export function DesktopNav({
   // Backward-compatible fallback if only flat `links` provided
   const navLinks = links || []
   return (
-    <nav className="hidden lg:flex items-center gap-x-7 text-xs font-semibold uppercase tracking-wider text-brand-primary">
-      {navLinks.map((link) => (
+    <nav className="hidden lg:flex items-center h-full gap-x-7 text-xs font-semibold uppercase tracking-wider text-brand-primary">
+      {navLinks.map((link, idx) => (
         <LinkComp
-          key={link.href}
+          key={`${link.label}-${link.href}-${idx}`}
           href={link.href}
           className={clsx(
-            "transition-colors duration-150 py-2 border-b-2 hover:text-brand-accent hover:border-brand-accent",
+            "h-full flex items-center px-1 transition-colors duration-150 border-b-2 hover:text-brand-accent hover:border-brand-accent",
             link.isActive
               ? "text-brand-accent border-brand-accent font-bold"
               : "text-brand-primary border-transparent"
