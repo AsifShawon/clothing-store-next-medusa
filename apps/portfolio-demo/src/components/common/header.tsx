@@ -28,11 +28,6 @@ export function StorefrontHeader() {
     setMounted(true)
   }, [])
 
-  // Don't render storefront header in admin routes
-  if (pathname?.startsWith("/demo-admin")) {
-    return null
-  }
-
   const navItems = useMemo(() => {
     const items = createStoreNavigation(demoRoutes)
     return items.map((item) => ({
@@ -42,6 +37,11 @@ export function StorefrontHeader() {
         (item.href !== "/" && pathname?.startsWith(item.href)),
     }))
   }, [pathname])
+
+  // Don't render storefront header in admin routes
+  if (pathname?.startsWith("/demo-admin")) {
+    return null
+  }
 
   return (
     <>
