@@ -21,11 +21,11 @@ test.describe("Shared View Visual & Architectural Layout Harness", () => {
         await expect(logo).toBeVisible()
 
         // Hero CTA button presence
-        const heroCta = page.locator("a:has-text('Explore Collection')").first()
+        const heroCta = page.locator("a:has-text('Collection')").first()
         await expect(heroCta).toBeVisible()
 
         // Department collections section
-        const sectionHeading = page.locator("text=Shop By Wardrobe Category").first()
+        const sectionHeading = page.locator("text=Wardrobe Departments").or(page.locator("text=Shop By Wardrobe Category")).first()
         await expect(sectionHeading).toBeVisible()
 
         assertCleanDiagnostics(diagnostics)

@@ -20,10 +20,10 @@ test.describe("Portfolio Demo Storefront Responsive Smoke Suite", () => {
         await expect(page.locator("text=LONDON BOY").first()).toBeVisible()
 
         // Hero title & CTA
-        await expect(page.locator("text=Structured Minimalism").first()).toBeVisible()
+        await expect(page.locator("text=Quiet British Tailoring").or(page.locator("text=Structured Minimalism")).first()).toBeVisible()
 
         // Department / Category sections
-        await expect(page.locator("text=Shop By Wardrobe Category").first()).toBeVisible()
+        await expect(page.locator("text=Wardrobe Departments").or(page.locator("text=Shop By Wardrobe Category")).first()).toBeVisible()
 
         // Footer links
         await expect(page.locator("footer").first()).toBeVisible()

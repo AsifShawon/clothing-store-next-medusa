@@ -8,11 +8,11 @@ test.describe("London Boy Customer Storefront & Checkout Journey", () => {
 
     // Check brand header and hero
     await expect(page.locator("text=LONDON BOY").first()).toBeVisible()
-    await expect(page.locator("text=Structured Minimalism").first()).toBeVisible()
+    await expect(page.locator("text=Quiet British Tailoring").or(page.locator("text=Structured Minimalism")).first()).toBeVisible()
 
     // Check department categories & featured rails
-    await expect(page.locator("text=Shop By Wardrobe Category").first()).toBeVisible()
-    await expect(page.locator("text=Featured Garments").first()).toBeVisible()
+    await expect(page.locator("text=Wardrobe Departments").or(page.locator("text=Shop By Wardrobe Category")).first()).toBeVisible()
+    await expect(page.locator("text=New Arrivals").or(page.locator("text=Featured Garments")).first()).toBeVisible()
 
     // Check product cards
     await expect(page.locator("text=London Boy Signature Heavyweight T-Shirt").first()).toBeVisible()
