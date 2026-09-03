@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react"
 import Link from "next/link"
 
@@ -17,25 +19,27 @@ export interface FooterProps {
 }
 
 const DEFAULT_CATEGORIES: FooterLinkItem[] = [
-  { label: "All Clothing", href: "/store" },
-  { label: "Men's Collection", href: "/categories/men" },
-  { label: "Women's Edit", href: "/categories/women" },
-  { label: "Caps & Accessories", href: "/categories/accessories" },
+  { label: "Shirts & Tailoring", href: "/category?handle=shirts" },
+  { label: "Polos & Heavyweight Tees", href: "/shop" },
+  { label: "Mayfair Chinos & Trousers", href: "/category?handle=chinos" },
+  { label: "French Linen Collection", href: "/category?handle=women" },
+  { label: "Caps & Accessories", href: "/category?handle=accessories" },
 ]
 
 const DEFAULT_COLLECTIONS: FooterLinkItem[] = [
-  { label: "New Arrivals", href: "/collections/new-arrivals" },
-  { label: "Best Sellers", href: "/collections/best-sellers" },
-  { label: "The Essentials Edit", href: "/collections/essentials" },
+  { label: "New Arrivals", href: "/collection?handle=new-arrivals" },
+  { label: "Iconic Bestsellers", href: "/collection?handle=best-sellers" },
+  { label: "The Wardrobe Essentials", href: "/collection?handle=essentials" },
+  { label: "All Garments", href: "/shop" },
 ]
 
 const DEFAULT_CUSTOMER_CARE: FooterLinkItem[] = [
   { label: "Size & Fit Guide", href: "/size-guide" },
   { label: "Frequently Asked Questions (FAQ)", href: "/faq" },
-  { label: "About London Boy", href: "/about" },
-  { label: "Contact Us", href: "/contact" },
+  { label: "Our Story & Craftsmanship", href: "/about" },
+  { label: "Customer Concierge", href: "/contact" },
   { label: "Shipping & Delivery Rates", href: "/shipping-policy" },
-  { label: "24h Return Policy", href: "/return-policy" },
+  { label: "24-Hour Easy Exchanges", href: "/return-policy" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms & Conditions", href: "/terms-and-conditions" },
 ]
@@ -50,90 +54,72 @@ export function Footer({
 }: FooterProps) {
   return (
     <footer className="bg-brand-primary text-brand-secondary border-t border-white/10 w-full mt-auto">
-      {/* Upper Trust Strip */}
-      <div className="border-b border-white/10 py-6 bg-black/40">
-        <div className="content-container grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      {/* Upper Reassurance Strip */}
+      <div className="border-b border-white/10 py-8 bg-black/30">
+        <div className="editorial-container grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
           <div className="flex flex-col items-center gap-1.5 p-2">
-            <span className="text-lg">🚚</span>
-            <h4 className="text-xs font-semibold font-heading uppercase tracking-wider text-white">
-              Fast Dhaka Delivery
-            </h4>
-            <p className="text-[11px] text-brand-muted/80">Inside Dhaka in 24–48h for ৳60</p>
+            <span className="font-heading font-bold text-xs uppercase tracking-widest text-white">
+              🚚 Express Dhaka Delivery
+            </span>
+            <p className="text-[11px] text-brand-sand/80 font-sans">Same-day dispatch • 24–48h courier nationwide</p>
           </div>
           <div className="flex flex-col items-center gap-1.5 p-2">
-            <span className="text-lg">🛡️</span>
-            <h4 className="text-xs font-semibold font-heading uppercase tracking-wider text-white">
-              24-Hour Returns
-            </h4>
-            <p className="text-[11px] text-brand-muted/80">Hassle-free size &amp; style exchange</p>
+            <span className="font-heading font-bold text-xs uppercase tracking-widest text-white">
+              🛡️ 24h Doorstep Exchanges
+            </span>
+            <p className="text-[11px] text-brand-sand/80 font-sans">Hassle-free size replacement at your home</p>
           </div>
           <div className="flex flex-col items-center gap-1.5 p-2">
-            <span className="text-lg">🧵</span>
-            <h4 className="text-xs font-semibold font-heading uppercase tracking-wider text-white">
-              240 GSM Dense Cotton
-            </h4>
-            <p className="text-[11px] text-brand-muted/80">Structured drape &amp; French linen</p>
+            <span className="font-heading font-bold text-xs uppercase tracking-widest text-white">
+              🧵 240 GSM Compact Cotton
+            </span>
+            <p className="text-[11px] text-brand-sand/80 font-sans">Pre-shrunk fibers &amp; pure French flax linen</p>
           </div>
           <div className="flex flex-col items-center gap-1.5 p-2">
-            <span className="text-lg">💳</span>
-            <h4 className="text-xs font-semibold font-heading uppercase tracking-wider text-white">
-              Cash on Delivery &amp; Card
-            </h4>
-            <p className="text-[11px] text-brand-muted/80">Pay upon delivery or secure checkout</p>
+            <span className="font-heading font-bold text-xs uppercase tracking-widest text-white">
+              💳 Cash on Delivery &amp; Cards
+            </span>
+            <p className="text-[11px] text-brand-sand/80 font-sans">bKash, Nagad, Visa, Mastercard, or COD</p>
           </div>
         </div>
       </div>
 
-      {/* Main Footer Links */}
-      <div className="content-container py-14 sm:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
-          {/* Brand Info */}
-          <div className="lg:col-span-2 space-y-4">
+      {/* Main 4-Column Footer */}
+      <div className="editorial-container py-14 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+          {/* Column 1: Brand & Craftsmanship */}
+          <div className="lg:col-span-5 space-y-4">
             <LinkComp href={homeHref} className="inline-block">
-              <span className="font-display text-2xl tracking-[0.2em] text-white font-bold">
+              <span className="font-display text-2xl tracking-[0.2em] text-white font-normal block">
                 LONDON BOY
               </span>
+              <span className="text-[10px] uppercase font-heading tracking-[0.3em] text-brand-sand font-semibold -mt-1 block">
+                EST. LONDON • DHAKA
+              </span>
             </LinkComp>
-            <p className="text-xs text-brand-muted leading-relaxed max-w-sm">
-              Modern British-inspired, confident, minimal and premium-accessible smart-casual clothing.
-              Engineered with 240 GSM combed compact cotton and French linen, tailored for modern living in Bangladesh.
+            <p className="text-xs text-brand-sand/80 leading-relaxed max-w-sm font-sans">
+              Modern British menswear engineered with 240 GSM combed compact cotton and pure French flax linen.
+              Tailored in specialized artisan ateliers in Dhaka for quiet confidence and lifelong durability.
             </p>
-            <div className="space-y-1.5 text-xs text-brand-muted/90 pt-2">
+            <div className="space-y-1 text-xs text-brand-sand/70 pt-2 font-sans">
               <p>📍 Tejgaon Industrial Area, Dhaka, Bangladesh</p>
               <p>
-                ✉️ Support:{" "}
-                <a href="mailto:londonboy@mack.com.bd" className="text-white hover:underline">
-                  londonboy@mack.com.bd
+                ✉️ Customer Concierge:{" "}
+                <a href="mailto:concierge@londonboy.uk" className="text-white hover:underline">
+                  concierge@londonboy.uk
                 </a>
               </p>
             </div>
 
-            {/* Optional Custom Slot (e.g. Demo Admin / Reset controls or Newsletter) */}
-            {customControlsSlot && <div className="pt-4">{customControlsSlot}</div>}
+            {customControlsSlot && <div className="pt-2">{customControlsSlot}</div>}
           </div>
 
-          {/* Categories */}
-          <div className="space-y-3">
-            <h4 className="font-heading text-xs font-semibold tracking-widest uppercase text-white">
-              Categories
-            </h4>
-            <ul className="space-y-2 text-xs text-brand-muted">
-              {categories.map((cat) => (
-                <li key={cat.href}>
-                  <LinkComp href={cat.href} className="hover:text-white transition-colors">
-                    {cat.label}
-                  </LinkComp>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Collections */}
-          <div className="space-y-3">
-            <h4 className="font-heading text-xs font-semibold tracking-widest uppercase text-white">
+          {/* Column 2: Collections */}
+          <div className="lg:col-span-2 space-y-3">
+            <h4 className="font-heading text-xs font-bold tracking-widest uppercase text-white">
               Collections
             </h4>
-            <ul className="space-y-2 text-xs text-brand-muted">
+            <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
               {collections.map((col) => (
                 <li key={col.href}>
                   <LinkComp href={col.href} className="hover:text-white transition-colors">
@@ -144,12 +130,28 @@ export function Footer({
             </ul>
           </div>
 
-          {/* Customer Care & Policies */}
-          <div className="space-y-3">
-            <h4 className="font-heading text-xs font-semibold tracking-widest uppercase text-white">
-              Customer Care
+          {/* Column 3: Departments */}
+          <div className="lg:col-span-2 space-y-3">
+            <h4 className="font-heading text-xs font-bold tracking-widest uppercase text-white">
+              Departments
             </h4>
-            <ul className="space-y-2 text-xs text-brand-muted">
+            <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
+              {categories.map((cat) => (
+                <li key={cat.href}>
+                  <LinkComp href={cat.href} className="hover:text-white transition-colors">
+                    {cat.label}
+                  </LinkComp>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Customer Care & Legal */}
+          <div className="lg:col-span-3 space-y-3">
+            <h4 className="font-heading text-xs font-bold tracking-widest uppercase text-white">
+              Client Concierge &amp; Care
+            </h4>
+            <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
               {customerCareLinks.map((item) => (
                 <li key={item.href}>
                   <LinkComp href={item.href} className="hover:text-white transition-colors">
@@ -161,15 +163,17 @@ export function Footer({
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
-          <p>© {new Date().getFullYear()} London Boy (londonboy.uk). All rights reserved.</p>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>Currency: 🇧🇩 BDT (৳)</span>
-            <span>•</span>
-            <LinkComp href="/shipping-policy" className="hover:underline">
-              Nationwide Delivery in BD
-            </LinkComp>
+        {/* Bottom Bar: Payment Badges & Copyright */}
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-brand-sand/70 font-sans">
+          <p>© {new Date().getFullYear()} London Boy (londonboy.uk). British Design, Dhaka Tailoring.</p>
+
+          {/* Payment Badges */}
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-heading font-bold uppercase tracking-wider">
+            <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">bKash</span>
+            <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">Nagad</span>
+            <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">Visa</span>
+            <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">Mastercard</span>
+            <span className="px-2 py-0.5 rounded bg-white/10 text-white border border-white/15">Cash on Delivery</span>
           </div>
         </div>
       </div>
