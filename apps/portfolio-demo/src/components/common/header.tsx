@@ -1,14 +1,18 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useDemoCart, useDemoStore } from "@lib/demo-store-context"
-import { AnnouncementBar } from "./announcement-bar"
 import { SearchModal } from "@components/store/search-modal"
 import { MobileNavDrawer } from "./mobile-nav-drawer"
 import { ResetDemoModal } from "./reset-demo-modal"
-import { Header as SharedHeader, BuildingStorefrontIcon } from "@dtc/storefront-ui"
+import {
+  Header as SharedHeader,
+  BuildingStorefrontIcon,
+  createStoreNavigation,
+} from "@dtc/storefront-ui"
+import { demoRoutes } from "../../adapters/local-storage/routes"
 
 export function StorefrontHeader() {
   const pathname = usePathname()
@@ -29,21 +33,20 @@ export function StorefrontHeader() {
     return null
   }
 
-  const navLinks = [
-    { label: "Shop All", href: "/shop", isActive: pathname === "/shop" },
-    { label: "New Arrivals", href: "/collection?handle=new-arrivals", isActive: pathname?.includes("new-arrivals") },
-    { label: "Men", href: "/category?handle=men", isActive: pathname?.includes("handle=men") },
-    { label: "Women", href: "/category?handle=women", isActive: pathname?.includes("handle=women") },
-    { label: "Essentials", href: "/collection?handle=essentials", isActive: pathname?.includes("essentials") },
-    { label: "Our Story", href: "/about", isActive: pathname === "/about" },
-  ]
+  const navItems = useMemo(() => {
+    const items = createStoreNavigation(demoRoutes)
+    return items.map((item) => ({
+      ...item,
+      isActive:
+        pathname === item.href ||
+        (item.href !== "/" && pathname?.startsWith(item.href)),
+    }))
+  }, [pathname])
 
   return (
     <>
-      <AnnouncementBar />
-
       <SharedHeader
-        navLinks={navLinks}
+        navItems={navItems}
         homeHref="/"
         cartHref="/cart"
         cartCount={mounted ? itemsCount : 0}
@@ -55,7 +58,7 @@ export function StorefrontHeader() {
         headerActionsSlot={
           <Link
             href="/demo-admin"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold bg-brand-secondary hover:bg-brand-sand/60 text-brand-primary border border-brand-border transition-colors font-heading uppercase tracking-wider"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-heading font-semibold bg-brand-secondary hover:bg-brand-sand/40 text-brand-primary border border-brand-border transition-colors rounded-full uppercase tracking-wider"
             title="Open Simulated Demo Admin Dashboard"
           >
             <BuildingStorefrontIcon className="w-3.5 h-3.5 text-brand-accent" />

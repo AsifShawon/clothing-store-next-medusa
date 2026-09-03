@@ -1,10 +1,15 @@
+"use client"
+
 import React from "react"
 import Link from "next/link"
 import { BarsThreeIcon, MagnifyingGlassIcon, ShoppingBagIcon, UserIcon } from "../icons"
 import { DesktopNav, NavLinkItem } from "./DesktopNav"
+import { MegaNavItem } from "./navigation-model"
+import { LinkComponent } from "../../types"
 
 export interface HeaderProps {
-  navLinks: NavLinkItem[]
+  navLinks?: NavLinkItem[]
+  navItems?: MegaNavItem[]
   homeHref?: string
   cartHref?: string
   cartCount?: number
@@ -15,11 +20,14 @@ export interface HeaderProps {
   onOpenMobileMenu?: () => void
   mobileMenuSlot?: React.ReactNode
   headerActionsSlot?: React.ReactNode
-  linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
+  announcementText?: string
+  secondaryLinks?: Array<{ label: string; href: string }>
+  linkComponent?: LinkComponent
 }
 
 export function Header({
   navLinks,
+  navItems,
   homeHref = "/",
   cartHref = "/cart",
   cartCount = 0,
@@ -30,12 +38,27 @@ export function Header({
   onOpenMobileMenu,
   mobileMenuSlot,
   headerActionsSlot,
+  announcementText = "Complimentary Dhaka Express Delivery on Orders Over ৳2,000 • 24h Easy Exchanges",
+  secondaryLinks = [
+    { label: "Our Story", href: "/about" },
+    { label: "Care & Support", href: "/contact" },
+  ],
   linkComponent: LinkComp = Link,
 }: HeaderProps) {
   return (
-    <header className="relative z-40 bg-white/95 backdrop-blur-md border-b border-brand-border/80 transition-all duration-200">
-      <div className="content-container flex items-center justify-between h-16 sm:h-20">
-        {/* Left: Mobile Menu & Desktop Primary Navigation */}
+    <header className="relative z-40 bg-white border-b border-brand-border/80 transition-all duration-200">
+      {/* 1. Slim Announcement Bar */}
+      {announcementText && (
+        <div className="bg-brand-primary text-brand-secondary text-[11px] font-heading font-medium tracking-wide py-2 px-4 text-center border-b border-white/10">
+          <div className="content-container flex items-center justify-center gap-2">
+            <span>{announcementText}</span>
+          </div>
+        </div>
+      )}
+
+      {/* 2. Utility Row: Secondary links, Centered Logo, and Actions */}
+      <div className="content-container flex items-center justify-between h-16 sm:h-20 border-b border-brand-border/40">
+        {/* Left: Mobile Menu Trigger & Secondary Desktop Links */}
         <div className="flex items-center gap-x-6 flex-1 basis-0">
           {mobileMenuSlot ? (
             <div className="lg:hidden">{mobileMenuSlot}</div>
@@ -52,7 +75,18 @@ export function Header({
             </div>
           ) : null}
 
-          <DesktopNav links={navLinks} linkComponent={LinkComp} />
+          {/* Secondary Desktop Utility Links */}
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-heading font-medium text-brand-primary/70">
+            {secondaryLinks.map((link) => (
+              <LinkComp
+                key={link.href}
+                href={link.href}
+                className="hover:text-brand-primary transition-colors"
+              >
+                {link.label}
+              </LinkComp>
+            ))}
+          </nav>
         </div>
 
         {/* Center: Brand Logotype */}
@@ -62,27 +96,27 @@ export function Header({
             className="flex flex-col items-center group py-1"
             data-testid="nav-store-link"
           >
-            <span className="font-display text-2xl sm:text-3xl tracking-[0.18em] text-brand-primary font-bold group-hover:opacity-90 transition-opacity">
+            <span className="font-display text-2xl sm:text-3xl tracking-[0.2em] text-brand-primary font-normal group-hover:opacity-90 transition-opacity">
               LONDON BOY
             </span>
-            <span className="text-[9px] sm:text-[10px] uppercase font-heading tracking-[0.3em] text-brand-muted font-semibold -mt-0.5">
+            <span className="text-[9px] sm:text-[10px] uppercase font-heading tracking-[0.32em] text-brand-muted font-semibold -mt-0.5">
               EST. LONDON • DHAKA
             </span>
           </LinkComp>
         </div>
 
-        {/* Right: Actions (Search, Custom Slot, Account, Cart) */}
-        <div className="flex items-center justify-end gap-x-3 sm:gap-x-5 flex-1 basis-0">
+        {/* Right: Actions (Search, Custom Slot, Account, Bag) */}
+        <div className="flex items-center justify-end gap-x-2 sm:gap-x-4 flex-1 basis-0">
           {/* Search Trigger */}
           {onOpenSearch && (
             <button
               type="button"
               onClick={onOpenSearch}
-              className="flex items-center gap-2 text-xs font-semibold text-brand-primary hover:text-brand-accent p-2 transition-colors group"
+              className="flex items-center gap-2 text-xs font-heading font-semibold text-brand-primary hover:text-brand-accent p-2 transition-colors group"
               aria-label="Search catalog"
             >
               <MagnifyingGlassIcon className="w-4 h-4 text-brand-primary group-hover:text-brand-accent transition-colors" />
-              <span className="hidden sm:inline font-heading uppercase tracking-wider text-[11px]">Search</span>
+              <span className="hidden sm:inline uppercase tracking-wider text-[11px]">Search</span>
             </button>
           )}
 
@@ -92,15 +126,15 @@ export function Header({
           {/* Account Link */}
           <LinkComp
             href={accountHref}
-            className="hidden sm:flex items-center gap-1.5 text-xs font-semibold font-heading uppercase tracking-wider text-brand-primary hover:text-brand-accent transition-colors p-2"
+            className="hidden sm:flex items-center gap-1.5 text-xs font-heading font-semibold uppercase tracking-wider text-brand-primary hover:text-brand-accent transition-colors p-2"
             data-testid="nav-account-link"
             aria-label="Customer Account"
           >
             <UserIcon className="w-4 h-4" />
-            <span className="hidden md:inline">Account</span>
+            <span className="hidden md:inline text-[11px]">Account</span>
           </LinkComp>
 
-          {/* Cart Trigger: Custom Node or Standard Button */}
+          {/* Cart Trigger */}
           {cartCountNode ? (
             cartCountNode
           ) : onCartClick ? (
@@ -112,7 +146,7 @@ export function Header({
               data-testid="nav-cart-link"
             >
               <ShoppingBagIcon className="w-5 h-5" />
-              <span className="text-xs font-semibold font-heading uppercase tracking-wider">
+              <span className="text-xs font-heading font-semibold uppercase tracking-wider text-[11px]">
                 Bag ({cartCount})
               </span>
             </button>
@@ -124,12 +158,21 @@ export function Header({
               data-testid="nav-cart-link"
             >
               <ShoppingBagIcon className="w-5 h-5" />
-              <span className="text-xs font-semibold font-heading uppercase tracking-wider">
+              <span className="text-xs font-heading font-semibold uppercase tracking-wider text-[11px]">
                 Bag ({cartCount})
               </span>
             </LinkComp>
           )}
         </div>
+      </div>
+
+      {/* 3. Primary Category Navigation Row with Mega Panels (Desktop) */}
+      <div className="hidden lg:flex items-center justify-center h-12 border-t border-brand-border/30 bg-white">
+        <DesktopNav
+          items={navItems}
+          links={navLinks}
+          linkComponent={LinkComp}
+        />
       </div>
     </header>
   )
