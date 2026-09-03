@@ -1,0 +1,75 @@
+name: Quality & Storefront Validation
+
+on:
+  push:
+    branches: [main, "refactor/*", "feat/*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  static-quality:
+    name: Static Quality & Storefront Parity Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm 10.11.1
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+          run_install: false
+
+      - name: Setup Node.js 20.19.0 with pnpm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Verify pnpm version
+        run: |
+          PNPM_VER=$(pnpm --version)
+          echo "Installed pnpm: $PNPM_VER"
+          if [ "$PNPM_VER" != "10.11.1" ]; then
+            echo "Error: Expected pnpm 10.11.1, found $PNPM_VER"
+            exit 1
+          fi
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Architecture & Shared UI Consumption
+        run: pnpm run check:architecture
+
+      - name: Type Check Workspace
+        run: pnpm run type-check
+
+      - name: Lint Workspace
+        run: pnpm run lint
+
+      - name: Shared Storefront UI Transition Tests
+        run: pnpm --filter @dtc/storefront-ui test
+
+      - name: Portfolio Demo Unit & Storage Tests
+        run: pnpm run demo:test
+
+      - name: Build Portfolio Demo (Static Export)
+        run: pnpm run demo:build
+
+      - name: Install Playwright Chromium Browser
+        run: pnpm --filter @dtc/portfolio-demo exec playwright install chromium --with-deps
+
+      - name: Run Playwright E2E & Smoke Tests
+        run: pnpm --filter @dtc/portfolio-demo run test:e2e --project=chromium
+
+      - name: Upload Playwright Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/portfolio-demo/playwright-report/
+          retention-days: 7
+
+      - name: Verify Clean Repository & No Whitespace Errors
+        run: git diff --check

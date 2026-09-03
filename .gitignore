@@ -55,3 +55,9 @@ yarn-error.log*
 ehthumbs.db
 Thumbs.db
 **/.DS_Store
+*.tsbuildinfo
+**/test-results/
+**/test-results.json
+**/.last-run.json
+
+**/playwright-report/

@@ -1,12 +1,13 @@
 import { Metadata } from "next"
 import { constructMetadata } from "@lib/util/seo"
-import FeaturedProducts from "@modules/home/components/featured-products"
-import Hero from "@modules/home/components/hero"
-import FeaturedCategories from "@modules/home/components/featured-categories"
-import BrandStory from "@modules/home/components/brand-story"
-import NewsletterSection from "@modules/home/components/newsletter-section"
-import { listCollections } from "@lib/data/collections"
+import { listProducts } from "@lib/data/products"
+import { listCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
+import { HomeView } from "@dtc/storefront-ui"
+import { createMedusaRoutes } from "@adapters/medusa/routes"
+import { toCategoryView, toProductView } from "@adapters/medusa/catalog"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { DEFAULT_MEDUSA_CAPABILITIES } from "@dtc/commerce-contracts"
 
 type Props = {
   params: Promise<{ countryCode: string }>
@@ -30,27 +31,27 @@ export default async function Home(props: {
   const { countryCode } = params
   const region = await getRegion(countryCode)
 
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
-
   if (!region) {
     return null
   }
 
+  const routes = createMedusaRoutes(countryCode)
+  const productCategories = await listCategories()
+  const { response } = await listProducts({
+    countryCode,
+    queryParams: { limit: 12 },
+  })
+
+  const featuredProducts = (response.products || []).map((p) => toProductView(p, region.currency_code))
+  const categories = (productCategories || []).map(toCategoryView)
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Hero />
-      <FeaturedCategories />
-      {collections && collections.length > 0 && (
-        <div className="py-12 bg-white">
-          <ul className="flex flex-col gap-y-8">
-            <FeaturedProducts collections={collections} region={region} />
-          </ul>
-        </div>
-      )}
-      <BrandStory />
-      <NewsletterSection />
-    </div>
+    <HomeView
+      featuredProducts={featuredProducts}
+      categories={categories}
+      routes={routes}
+      capabilities={DEFAULT_MEDUSA_CAPABILITIES}
+      linkComponent={LocalizedClientLink}
+    />
   )
 }

@@ -230,12 +230,14 @@ export async function setShippingMethod({
 
   return sdk.store.cart
     .addShippingMethod(cartId, { option_id: shippingMethodId }, {}, headers)
-    .then(async () => {
+    .then(async ({ cart }: { cart: HttpTypes.StoreCart }) => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
+      return cart
     })
     .catch(medusaError)
 }
+
 
 export async function initiatePaymentSession(
   cart: HttpTypes.StoreCart,

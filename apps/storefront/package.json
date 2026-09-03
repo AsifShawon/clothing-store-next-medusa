@@ -12,9 +12,12 @@
     "build": "next build",
     "start": "next start -p 8000",
     "lint": "next lint",
+    "type-check": "tsc --noEmit",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@dtc/commerce-contracts": "workspace:*",
+    "@dtc/storefront-ui": "workspace:*",
     "@headlessui/react": "^2.2.0",
     "@medusajs/icons": "2.19.0",
     "@medusajs/js-sdk": "2.19.0",

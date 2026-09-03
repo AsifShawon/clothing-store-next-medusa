@@ -1,7 +1,9 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import SizeGuideTemplate from "@modules/size-guide/templates/size-guide-template"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { SizeGuideView } from "@dtc/storefront-ui"
+import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
 type Props = {
   params: Promise<{ countryCode: string }>
@@ -20,6 +22,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function SizeGuidePage(props: Props) {
   const { countryCode } = await props.params
+  const routes = createMedusaRoutes(countryCode)
 
   const breadcrumbs = getBreadcrumbSchema([
     { name: "Home", url: `/${countryCode}` },
@@ -29,7 +32,7 @@ export default async function SizeGuidePage(props: Props) {
   return (
     <>
       <JsonLd data={breadcrumbs} />
-      <SizeGuideTemplate />
+      <SizeGuideView routes={routes} linkComponent={LocalizedClientLink} />
     </>
   )
 }

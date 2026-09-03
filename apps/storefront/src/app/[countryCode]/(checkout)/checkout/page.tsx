@@ -1,9 +1,9 @@
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
+import { listCartShippingMethods } from "@lib/data/fulfillment"
+import { listCartPaymentMethods } from "@lib/data/payment"
 import { constructMetadata } from "@lib/util/seo"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
-import CheckoutForm from "@modules/checkout/templates/checkout-form"
-import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
+import MedusaCheckoutClient from "@modules/checkout/components/checkout-client"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 
@@ -26,19 +26,16 @@ export default async function Checkout(props: Props) {
   }
 
   const customer = await retrieveCustomer()
+  const shippingMethods = await listCartShippingMethods(cart.id).catch(() => [])
+  const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "").catch(() => [])
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-12 content-container gap-10 lg:gap-14 py-10 sm:py-14 items-start">
-        <div className="lg:col-span-7">
-          <PaymentWrapper cart={cart}>
-            <CheckoutForm cart={cart} customer={customer} />
-          </PaymentWrapper>
-        </div>
-        <div className="lg:col-span-5 lg:sticky lg:top-24">
-          <CheckoutSummary cart={cart} />
-        </div>
-      </div>
-    </div>
+    <MedusaCheckoutClient
+      cart={cart}
+      customer={customer}
+      availableShippingMethods={shippingMethods || []}
+      availablePaymentMethods={paymentMethods || []}
+      countryCode={countryCode}
+    />
   )
 }

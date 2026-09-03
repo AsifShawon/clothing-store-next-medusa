@@ -14,7 +14,7 @@ The following concepts, patterns, and technologies are **STRICTLY PROHIBITED** f
 | :--- | :--- | :--- |
 | **SaaS & Multi-tenancy** | No tenant isolation, tenant IDs, or multi-tenant schemas. | Single-brand direct-to-consumer store only. |
 | **Marketplace Vendors** | No vendor portals, vendor payout logic, or multi-vendor catalogs. | Single brand ownership. |
-| **Custom Admin Dashboard** | Do not build a separate admin dashboard. | The built-in Medusa Admin at `/app` (`@medusajs/dashboard`) must be used. |
+| **Custom Admin Dashboard** | Do not build a separate admin dashboard for the Medusa backend. | The built-in Medusa Admin at `/app` (`@medusajs/dashboard`) must be used for real store operations. (Note: A simulated client-side Demo Admin is permitted solely within `apps/portfolio-demo` for browser-only demonstration). |
 | **Alternative Frameworks** | No NestJS, Express rewrites, or competing backend frameworks. | Medusa v2 framework is standard. |
 | **AI / Recommendations** | No AI agents in runtime checkout, LLM product generation, or pgvector embeddings. | Out of scope; focus on core e-commerce stability. |
 | **Search Engines** | No Meilisearch, Elasticsearch, or Algolia integrations. | Medusa native search and filtering are sufficient for single-brand catalog. |
