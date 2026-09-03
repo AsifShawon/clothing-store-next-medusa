@@ -6,6 +6,8 @@ import {
   CollectionView as CollectionModel,
   ProductFilterView,
   ProductView,
+  QuickAddRequest,
+  QuickAddResult,
   StoreCapabilities,
   StoreRoutes,
 } from "@dtc/commerce-contracts"
@@ -21,6 +23,8 @@ export interface CollectionViewProps {
   onResetFilters: () => void
   routes: StoreRoutes
   capabilities?: StoreCapabilities
+  onQuickAdd?: (req: QuickAddRequest) => Promise<QuickAddResult>
+  isLoading?: boolean
   linkComponent?: LinkComponent
 }
 
@@ -33,6 +37,8 @@ export function CollectionView({
   onResetFilters,
   routes,
   capabilities,
+  onQuickAdd,
+  isLoading,
   linkComponent = Link,
 }: CollectionViewProps) {
   const breadcrumbs = [
@@ -52,6 +58,8 @@ export function CollectionView({
       onResetFilters={onResetFilters}
       routes={routes}
       capabilities={capabilities}
+      onQuickAdd={onQuickAdd}
+      isLoading={isLoading}
       breadcrumbs={breadcrumbs}
       linkComponent={linkComponent}
     />

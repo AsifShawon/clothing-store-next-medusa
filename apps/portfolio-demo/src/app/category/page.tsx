@@ -3,9 +3,14 @@
 import React, { useMemo, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { useDemoProducts } from "@lib/demo-store-context"
+import { useDemoProducts, useDemoCart, useDemoStore } from "@lib/demo-store-context"
 import { CategoryView } from "@dtc/storefront-ui"
-import { ProductFilterView, DEFAULT_DEMO_CAPABILITIES } from "@dtc/commerce-contracts"
+import {
+  ProductFilterView,
+  DEFAULT_DEMO_CAPABILITIES,
+  QuickAddRequest,
+  QuickAddResult,
+} from "@dtc/commerce-contracts"
 import { toCategoryView, toProductView } from "../../adapters/local-storage/catalog"
 import { demoRoutes } from "../../adapters/local-storage/routes"
 
@@ -14,6 +19,8 @@ function CategoryContent() {
   const handle = searchParams.get("handle") || "men"
 
   const { allProducts, categories } = useDemoProducts()
+  const { addItem } = useDemoCart()
+  const { setIsCartDrawerOpen } = useDemoStore()
 
   const currentCategory = useMemo(() => {
     return (
@@ -44,6 +51,24 @@ function CategoryContent() {
 
   const productViews = useMemo(() => filteredProducts.map(toProductView), [filteredProducts])
 
+  const handleQuickAdd = async (req: QuickAddRequest): Promise<QuickAddResult> => {
+    try {
+      const prod = allProducts.find((p) => p.id === req.productId)
+      const variant = prod?.variants.find((v) => v.id === req.variantId)
+      if (!prod || !variant) {
+        return { success: false, message: "Garment or size not found" }
+      }
+      addItem(prod, variant, req.quantity)
+      setIsCartDrawerOpen(true)
+      return { success: true }
+    } catch (err: unknown) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Could not add to bag",
+      }
+    }
+  }
+
   return (
     <CategoryView
       category={toCategoryView(currentCategory)}
@@ -54,6 +79,7 @@ function CategoryContent() {
       onResetFilters={() => setFilters({ sortBy: "featured" })}
       routes={demoRoutes}
       capabilities={DEFAULT_DEMO_CAPABILITIES}
+      onQuickAdd={handleQuickAdd}
       linkComponent={Link}
     />
   )

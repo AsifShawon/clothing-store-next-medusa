@@ -3,9 +3,14 @@
 import React, { useState, useMemo, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { useDemoProducts } from "@lib/demo-store-context"
+import { useDemoProducts, useDemoCart, useDemoStore } from "@lib/demo-store-context"
 import { CatalogView } from "@dtc/storefront-ui"
-import { ProductFilterView, DEFAULT_DEMO_CAPABILITIES } from "@dtc/commerce-contracts"
+import {
+  ProductFilterView,
+  DEFAULT_DEMO_CAPABILITIES,
+  QuickAddRequest,
+  QuickAddResult,
+} from "@dtc/commerce-contracts"
 import { toCategoryView, toProductView } from "../../adapters/local-storage/catalog"
 import { demoRoutes } from "../../adapters/local-storage/routes"
 
@@ -16,6 +21,8 @@ function ShopContent() {
   const initialSearch = searchParams.get("q") || undefined
 
   const { allProducts, categories } = useDemoProducts()
+  const { addItem } = useDemoCart()
+  const { setIsCartDrawerOpen } = useDemoStore()
 
   const [filters, setFilters] = useState<ProductFilterView>({
     search: initialSearch,
@@ -62,8 +69,9 @@ function ShopContent() {
         // Category
         if (filters.category && filters.category !== "all") {
           const match = product.categoryNames.some(
-            (c) => c.toLowerCase() === filters.category!.toLowerCase() ||
-                   c.toLowerCase().replace(/\s+/g, "-") === filters.category!.toLowerCase()
+            (c) =>
+              c.toLowerCase() === filters.category!.toLowerCase() ||
+              c.toLowerCase().replace(/\s+/g, "-") === filters.category!.toLowerCase()
           )
           if (!match) return false
         }
@@ -113,6 +121,24 @@ function ShopContent() {
   const productViews = useMemo(() => filteredProducts.map(toProductView), [filteredProducts])
   const categoryViews = useMemo(() => categories.map(toCategoryView), [categories])
 
+  const handleQuickAdd = async (req: QuickAddRequest): Promise<QuickAddResult> => {
+    try {
+      const prod = allProducts.find((p) => p.id === req.productId)
+      const variant = prod?.variants.find((v) => v.id === req.variantId)
+      if (!prod || !variant) {
+        return { success: false, message: "Garment or size not found" }
+      }
+      addItem(prod, variant, req.quantity)
+      setIsCartDrawerOpen(true)
+      return { success: true }
+    } catch (err: unknown) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Could not add to bag",
+      }
+    }
+  }
+
   return (
     <CatalogView
       title="All Clothing"
@@ -125,6 +151,7 @@ function ShopContent() {
       onResetFilters={handleResetFilters}
       routes={demoRoutes}
       capabilities={DEFAULT_DEMO_CAPABILITIES}
+      onQuickAdd={handleQuickAdd}
       linkComponent={Link}
     />
   )
