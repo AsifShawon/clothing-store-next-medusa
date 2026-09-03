@@ -1,4 +1,5 @@
 export * from "./ProductCard"
+export * from "./MobileQuickAddSheet"
 export * from "./ProductGrid"
 export * from "./ImageGallery"
 export * from "./ProductInfo"

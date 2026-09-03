@@ -61,6 +61,19 @@ export interface AddCartItemInput {
   quantity: number
 }
 
+export interface QuickAddRequest {
+  productId: string
+  variantId: string
+  quantity: number
+}
+
+export interface QuickAddResult {
+  success: boolean
+  message?: string
+}
+
+export type QuickAddHandler = (req: QuickAddRequest) => Promise<QuickAddResult>
+
 export interface CartActions {
   addItem(input: AddCartItemInput): Promise<void>
   updateItem(lineId: string, quantity: number): Promise<void>

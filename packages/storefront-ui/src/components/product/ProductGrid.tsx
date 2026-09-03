@@ -1,6 +1,12 @@
 import React from "react"
 import Link from "next/link"
-import { ProductView, StoreCapabilities, StoreRoutes } from "@dtc/commerce-contracts"
+import {
+  ProductView,
+  QuickAddRequest,
+  QuickAddResult,
+  StoreCapabilities,
+  StoreRoutes,
+} from "@dtc/commerce-contracts"
 import { ProductCard } from "./ProductCard"
 import { LinkComponent } from "../../types"
 
@@ -8,6 +14,7 @@ export interface ProductGridProps {
   products: ProductView[]
   routes: StoreRoutes
   capabilities?: StoreCapabilities
+  onQuickAdd?: (req: QuickAddRequest) => Promise<QuickAddResult>
   emptyStateTitle?: string
   emptyStateMessage?: string
   linkComponent?: LinkComponent
@@ -17,6 +24,7 @@ export function ProductGrid({
   products,
   routes,
   capabilities,
+  onQuickAdd,
   emptyStateTitle = "No garments found",
   emptyStateMessage = "Try adjusting your filters or search keywords.",
   linkComponent: LinkComp = Link,
@@ -50,6 +58,7 @@ export function ProductGrid({
           product={product}
           href={routes.product(product.handle)}
           capabilities={capabilities}
+          onQuickAdd={onQuickAdd}
           linkComponent={LinkComp}
         />
       ))}

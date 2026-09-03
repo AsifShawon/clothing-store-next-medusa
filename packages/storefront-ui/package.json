@@ -14,7 +14,7 @@
     "./styles/*": "./src/styles/*"
   },
   "scripts": {
-    "test": "node -e \"const { createJiti } = require('jiti'); const jiti = createJiti(process.cwd()); jiti('./src/views/__tests__/checkout-transitions.test.ts'); jiti('./src/__tests__/navigation-interactions.test.ts'); jiti('./src/__tests__/search-predictive.test.ts');\"",
+    "test": "node -e \"const { createJiti } = require('jiti'); const jiti = createJiti(process.cwd()); jiti('./src/views/__tests__/checkout-transitions.test.ts'); jiti('./src/__tests__/navigation-interactions.test.ts'); jiti('./src/__tests__/search-predictive.test.ts'); jiti('./src/__tests__/product-card-interactions.test.ts');\"",
     "type-check": "tsc --noEmit"
   },
 

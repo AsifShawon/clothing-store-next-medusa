@@ -1,15 +1,24 @@
-import React from "react"
+"use client"
+
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ProductView, StoreCapabilities } from "@dtc/commerce-contracts"
+import {
+  ProductView,
+  QuickAddRequest,
+  QuickAddResult,
+  StoreCapabilities,
+} from "@dtc/commerce-contracts"
 import { COLOR_SWATCHES } from "../../theme/colors"
 import { LinkComponent } from "../../types"
+import { MobileQuickAddSheet } from "./MobileQuickAddSheet"
+import { CheckIcon } from "../icons"
 
 export interface ProductCardProps {
   product: ProductView
   href: string
   capabilities?: StoreCapabilities
-  onQuickAdd?: (product: ProductView) => void
+  onQuickAdd?: (req: QuickAddRequest) => Promise<QuickAddResult>
   linkComponent?: LinkComponent
 }
 
@@ -17,122 +26,300 @@ export function ProductCard({
   product,
   href,
   capabilities,
+  onQuickAdd,
   linkComponent: LinkComp = Link,
 }: ProductCardProps) {
-  const thumbnail = product.thumbnail || product.images[0]
-  const isSoldOut = !product.inStock || (product.totalStock !== undefined && product.totalStock <= 0)
-  const isLowStock = !isSoldOut && product.totalStock !== undefined && product.totalStock > 0 && product.totalStock <= 5
+  const colorOption = product.options?.find((o) => o.title.toLowerCase() === "color")
+  const sizeOption = product.options?.find((o) => o.title.toLowerCase() === "size")
 
-  const colorOption = capabilities?.hasColorSwatches
-    ? product.options?.find((o) => o.title.toLowerCase() === "color")
-    : undefined
+  // Active color state
+  const [selectedColor, setSelectedColor] = useState<string>(
+    colorOption?.values[0] || ""
+  )
 
-  const variantCount = product.variants?.length || 0
+  // Quick Add states
+  const [pendingVariantId, setPendingVariantId] = useState<string | null>(null)
+  const [successVariantId, setSuccessVariantId] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
+
+  // Primary and secondary images
+  const primaryImage = product.thumbnail || product.images[0]
+  const secondaryImage = product.images.length > 1 ? product.images[1] : undefined
+
+  // Stock status
+  const isSoldOut =
+    !product.inStock || (product.totalStock !== undefined && product.totalStock <= 0)
+  const isLowStock =
+    !isSoldOut &&
+    product.totalStock !== undefined &&
+    product.totalStock > 0 &&
+    product.totalStock <= 5
+
   const fabricInfo = product.material || product.subtitle || "British Smart-Casual"
 
+  // Sizes available for the selected color
+  const availableSizes = useMemo(() => {
+    if (!sizeOption) return []
+    return sizeOption.values.map((size) => {
+      const variant = product.variants.find((v) => {
+        const matchColor =
+          !colorOption ||
+          v.options["Color"]?.toLowerCase() === selectedColor.toLowerCase()
+        const matchSize = v.options["Size"]?.toLowerCase() === size.toLowerCase()
+        return matchColor && matchSize
+      })
+      return {
+        size,
+        variantId: variant?.id,
+        inStock: variant ? variant.inStock : false,
+      }
+    })
+  }, [product.variants, sizeOption, colorOption, selectedColor])
+
+  // Quick Add size click handler
+  const handleQuickAddSize = async (variantId: string | undefined) => {
+    if (!variantId || pendingVariantId || !onQuickAdd) return
+
+    setPendingVariantId(variantId)
+    setErrorMessage(null)
+
+    try {
+      const result = await onQuickAdd({
+        productId: product.id,
+        variantId,
+        quantity: 1,
+      })
+
+      if (result && result.success === false) {
+        setErrorMessage(result.message || "Could not add")
+      } else {
+        setSuccessVariantId(variantId)
+        setTimeout(() => setSuccessVariantId(null), 1800)
+      }
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Error")
+    } finally {
+      setPendingVariantId(null)
+    }
+  }
+
   return (
-    <LinkComp
-      href={href}
-      className="group flex flex-col bg-white border border-brand-border/70 hover:border-brand-primary transition-all duration-300 hover:shadow-lg"
-    >
-      <div data-testid="product-wrapper" className="flex flex-col h-full">
-        {/* Thumbnail Image Container */}
+    <>
+      <article
+        data-testid="product-wrapper"
+        className="product-card group relative flex flex-col bg-white border border-brand-border/80 hover:border-brand-primary rounded-xl overflow-hidden transition-all duration-300 shadow-subtle hover:shadow-editorial"
+      >
+        {/* 1. Image Canvas & Badges */}
         <div className="relative aspect-[3/4] w-full bg-brand-secondary overflow-hidden">
-          {thumbnail?.url ? (
-            <Image
-              src={thumbnail.url}
-              alt={thumbnail.altText || product.title}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-brand-muted text-xs">
-              No Image
+          <LinkComp
+            href={href}
+            className="block w-full h-full relative"
+            aria-label={`View details for ${product.title}`}
+          >
+            {primaryImage?.url ? (
+              <Image
+                src={primaryImage.url}
+                alt={primaryImage.altText || product.title}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className={`object-cover object-center transition-all duration-500 ${
+                  secondaryImage
+                    ? "group-hover:opacity-0 group-hover:scale-105"
+                    : "group-hover:scale-105"
+                }`}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-brand-muted text-xs">
+                London Boy
+              </div>
+            )}
+
+            {secondaryImage?.url && (
+              <Image
+                src={secondaryImage.url}
+                alt={secondaryImage.altText || `${product.title} alternate angle`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover object-center absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+              />
+            )}
+          </LinkComp>
+
+          {/* Status Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+            {product.isNewArrival && (
+              <span className="bg-brand-accent text-white text-[9px] font-heading font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-xs">
+                New In
+              </span>
+            )}
+            {product.isBestSeller && !product.isNewArrival && (
+              <span className="bg-brand-secondary text-brand-accent border border-brand-accent/30 text-[9px] font-heading font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-xs">
+                Bestseller
+              </span>
+            )}
+            {isSoldOut && (
+              <span className="bg-rose-900 text-white text-[9px] font-heading font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-xs">
+                Sold Out
+              </span>
+            )}
+            {isLowStock && (
+              <span className="bg-amber-800 text-white text-[9px] font-heading font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-xs">
+                Only {product.totalStock} Left
+              </span>
+            )}
+          </div>
+
+          {/* Desktop Quick Add Hover Tray */}
+          {onQuickAdd && !isSoldOut && availableSizes.length > 0 && (
+            <div className="hidden lg:flex absolute inset-x-2 bottom-2 z-20 bg-white/95 backdrop-blur-sm border border-brand-border/90 rounded-lg p-2 flex-col gap-1.5 shadow-md transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 transition-all duration-200">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-heading font-bold uppercase tracking-wider text-brand-muted">
+                  Quick Add
+                </span>
+                {errorMessage ? (
+                  <span className="text-[10px] text-rose-700 font-bold">Failed</span>
+                ) : successVariantId ? (
+                  <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                    <CheckIcon className="w-3 h-3" /> Added ✓
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="flex items-center gap-1">
+                {availableSizes.map(({ size, variantId, inStock }) => {
+                  const isPending = pendingVariantId === variantId
+                  const isSuccess = successVariantId === variantId
+
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      disabled={!inStock || isPending || Boolean(pendingVariantId)}
+                      onClick={() => handleQuickAddSize(variantId)}
+                      aria-label={`Quick add size ${size}`}
+                      className={`flex-1 h-8 rounded text-[11px] font-heading font-semibold uppercase tracking-wider transition-all flex items-center justify-center ${
+                        !inStock
+                          ? "opacity-30 line-through cursor-not-allowed bg-brand-surface text-brand-muted"
+                          : isSuccess
+                            ? "bg-emerald-700 text-white"
+                            : isPending
+                              ? "bg-brand-secondary text-brand-primary animate-pulse"
+                              : "bg-white hover:bg-brand-primary hover:text-white border border-brand-border text-brand-primary"
+                      }`}
+                    >
+                      {isPending ? "..." : size}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           )}
 
-          {/* Badges */}
-          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
-            {product.isNewArrival && (
-              <div className="bg-brand-accent text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 shadow-xs">
-                New In
-              </div>
-            )}
-            {product.isBestSeller && !product.isNewArrival && (
-              <div className="bg-brand-secondary text-brand-accent border border-brand-accent/30 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 shadow-xs">
-                Bestseller
-              </div>
-            )}
-            {isSoldOut && (
-              <div className="bg-rose-800 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 shadow-xs">
-                Sold Out
-              </div>
-            )}
-            {isLowStock && (
-              <div className="bg-amber-700 text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 shadow-xs">
-                Only {product.totalStock} Left
-              </div>
-            )}
-          </div>
+          {/* Mobile Quick Add Trigger Button */}
+          {onQuickAdd && !isSoldOut && (
+            <button
+              type="button"
+              onClick={() => setIsMobileSheetOpen(true)}
+              className="lg:hidden absolute bottom-2 right-2 z-20 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-sm text-brand-primary border border-brand-border text-[10px] font-heading font-bold uppercase tracking-wider shadow-sm flex items-center gap-1"
+              aria-label={`Quick Add ${product.title}`}
+            >
+              <span>+ Quick Add</span>
+            </button>
+          )}
         </div>
 
-        {/* Product Details */}
-        <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5 bg-white">
+        {/* 2. Product Details & Swatches */}
+        <div className="p-4 flex-1 flex flex-col justify-between space-y-3 bg-white">
           <div className="space-y-1">
-            <h3
-              className="font-heading font-bold text-sm text-brand-primary group-hover:text-brand-accent transition-colors line-clamp-1"
-              data-testid="product-title"
-            >
-              {product.title}
-            </h3>
-            <p className="text-[11px] text-brand-primary/60 line-clamp-1">
+            <LinkComp href={href} className="block group-hover:text-brand-accent transition-colors">
+              <h3
+                className="font-heading font-bold text-sm text-brand-primary truncate group-hover:underline"
+                data-testid="product-title"
+              >
+                {product.title}
+              </h3>
+            </LinkComp>
+            <p className="text-[11px] text-brand-primary/60 truncate">
               {fabricInfo}
             </p>
           </div>
 
-          {/* Color Swatches if enabled */}
+          {/* Color Swatches */}
           {colorOption && colorOption.values.length > 0 && (
-            <div className="flex items-center gap-1.5 pt-1">
-              {colorOption.values.slice(0, 5).map((val) => {
-                const hex = COLOR_SWATCHES[val.toLowerCase()] || "#cccccc"
-                return (
-                  <span
-                    key={val}
-                    title={val}
-                    style={{ backgroundColor: hex }}
-                    className="w-3 h-3 rounded-full border border-brand-border shadow-2xs"
-                  />
-                )
-              })}
-              {colorOption.values.length > 5 && (
-                <span className="text-[10px] text-brand-muted font-medium">
-                  +{colorOption.values.length - 5}
+            <div className="space-y-1 pt-0.5">
+              <div
+                role="radiogroup"
+                aria-label={`Available colors for ${product.title}`}
+                className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"
+              >
+                {colorOption.values.map((val) => {
+                  const isSelected = selectedColor.toLowerCase() === val.toLowerCase()
+                  const hex = COLOR_SWATCHES[val.toLowerCase()] || "#cccccc"
+
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => setSelectedColor(val)}
+                      title={`Color: ${val}`}
+                      aria-label={`Select color ${val}`}
+                      className={`relative w-4 h-4 rounded-full transition-transform flex items-center justify-center ${
+                        isSelected ? "ring-2 ring-brand-primary ring-offset-1 scale-110" : "hover:scale-105"
+                      }`}
+                    >
+                      <span
+                        style={{ backgroundColor: hex }}
+                        className="w-full h-full rounded-full border border-black/15 shadow-2xs block"
+                      />
+                    </button>
+                  )
+                })}
+              </div>
+
+              {selectedColor && (
+                <span className="text-[10px] font-heading text-brand-muted block">
+                  {selectedColor}
                 </span>
               )}
             </div>
           )}
 
-          <div className="pt-2 border-t border-brand-border/40 flex items-center justify-between">
+          {/* Pricing & Variant Info */}
+          <div className="pt-2 border-t border-brand-border/50 flex items-center justify-between">
             <div className="flex items-baseline gap-1.5">
               <span className="font-heading font-bold text-xs sm:text-sm text-brand-primary">
                 {product.minPrice.formatted}
               </span>
               {product.minPrice.approxUsd && (
-                <span className="text-[10px] text-brand-muted">
+                <span className="text-[10px] text-brand-muted font-mono">
                   (≈${product.minPrice.approxUsd})
                 </span>
               )}
             </div>
 
-            {variantCount > 0 && (
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-brand-primary/50">
-                {variantCount} Variants
+            {product.variants.length > 0 && (
+              <span className="text-[10px] uppercase font-heading font-medium tracking-wider text-brand-muted">
+                {product.variants.length} Sizes
               </span>
             )}
           </div>
         </div>
-      </div>
-    </LinkComp>
+      </article>
+
+      {/* Mobile Quick Add Bottom Sheet Modal */}
+      {isMobileSheetOpen && (
+        <MobileQuickAddSheet
+          isOpen={isMobileSheetOpen}
+          onClose={() => setIsMobileSheetOpen(false)}
+          product={product}
+          href={href}
+          onQuickAdd={onQuickAdd}
+          linkComponent={LinkComp}
+        />
+      )}
+    </>
   )
 }
