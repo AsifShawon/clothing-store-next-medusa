@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useDemoProduct, useDemoProducts, useDemoCart, useDemoStore } from "@lib/demo-store-context"
 import { ProductDetailView, ShareIcon } from "@dtc/storefront-ui"
-import { DEFAULT_DEMO_CAPABILITIES } from "@dtc/commerce-contracts"
+import { DEFAULT_DEMO_CAPABILITIES, QuickAddRequest, QuickAddResult } from "@dtc/commerce-contracts"
 import { toProductView } from "../../adapters/local-storage/catalog"
 import { demoRoutes } from "../../adapters/local-storage/routes"
 
@@ -16,7 +16,7 @@ function ProductDetailContent() {
   const { product } = useDemoProduct(handle)
   const { allProducts } = useDemoProducts()
   const { addItem } = useDemoCart()
-  const { showToast } = useDemoStore()
+  const { showToast, setIsCartDrawerOpen } = useDemoStore()
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({})
   const [quantity, setQuantity] = useState(1)
@@ -51,6 +51,25 @@ function ProductDetailContent() {
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return
     addItem(product, selectedVariant, quantity)
+    setIsCartDrawerOpen(true)
+  }
+
+  const handleQuickAdd = async (req: QuickAddRequest): Promise<QuickAddResult> => {
+    try {
+      const prod = allProducts.find((p) => p.id === req.productId)
+      const variant = prod?.variants.find((v) => v.id === req.variantId)
+      if (!prod || !variant) {
+        return { success: false, message: "Garment or size not found" }
+      }
+      addItem(prod, variant, req.quantity)
+      setIsCartDrawerOpen(true)
+      return { success: true }
+    } catch (err: unknown) {
+      return {
+        success: false,
+        message: err instanceof Error ? err.message : "Could not add to bag",
+      }
+    }
   }
 
   const handleCopyLink = () => {
@@ -97,6 +116,7 @@ function ProductDetailContent() {
       quantity={quantity}
       onQuantityChange={setQuantity}
       onAddToCart={handleAddToCart}
+      onQuickAdd={handleQuickAdd}
       routes={demoRoutes}
       capabilities={DEFAULT_DEMO_CAPABILITIES}
       linkComponent={Link}
