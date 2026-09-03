@@ -1,11 +1,22 @@
+"use client"
+
 import React from "react"
-import { CategoryView, ProductView, StoreCapabilities, StoreRoutes } from "@dtc/commerce-contracts"
+import {
+  CategoryView,
+  ProductView,
+  QuickAddRequest,
+  QuickAddResult,
+  StoreCapabilities,
+  StoreRoutes,
+} from "@dtc/commerce-contracts"
 import { HeroSection } from "../components/home/HeroSection"
 import { FeaturedCategories } from "../components/home/FeaturedCategories"
 import { ProductRails } from "../components/home/ProductRails"
-import { BrandStorySection } from "../components/home/BrandStorySection"
-import { NewsletterSection } from "../components/home/NewsletterSection"
+import { CraftsmanshipSection } from "../components/home/CraftsmanshipSection"
+import { SplitPromoSection } from "../components/home/SplitPromoSection"
+import { BrandValuesGrid } from "../components/home/BrandValuesGrid"
 import { DeliveryGuaranteesSection } from "../components/home/DeliveryGuaranteesSection"
+import { NewsletterSection } from "../components/home/NewsletterSection"
 import { LinkComponent } from "../types"
 
 export interface HomeViewProps {
@@ -14,6 +25,7 @@ export interface HomeViewProps {
   categories: CategoryView[]
   routes: StoreRoutes
   capabilities?: StoreCapabilities
+  onQuickAdd?: (req: QuickAddRequest) => Promise<QuickAddResult>
   secondaryCtaSlot?: React.ReactNode
   newsletterSlot?: React.ReactNode
   linkComponent?: LinkComponent
@@ -25,6 +37,7 @@ export function HomeView({
   categories,
   routes,
   capabilities,
+  onQuickAdd,
   secondaryCtaSlot,
   newsletterSlot,
   linkComponent,
@@ -35,7 +48,7 @@ export function HomeView({
 
   return (
     <div className="flex flex-col w-full">
-      {/* Editorial Hero */}
+      {/* 1. Editorial Hero */}
       <HeroSection
         routes={routes}
         featuredProduct={heroProduct || featuredProducts[0]}
@@ -43,44 +56,54 @@ export function HomeView({
         linkComponent={linkComponent}
       />
 
-      {/* Featured Categories */}
+      {/* 2. Category Mosaic / Department Grid */}
       <FeaturedCategories
         categories={categories}
         routes={routes}
         linkComponent={linkComponent}
       />
 
-      {/* Curated Product Rail */}
+      {/* 3. New Arrivals Rail */}
       <ProductRails
-        title="Featured Garments"
-        subtitle="Designed for longevity, structured drape, and versatile smart-casual styling."
-        viewAllHref={routes.catalog()}
+        title="Seasonal New Arrivals"
+        subtitle="Cut from dense, pre-washed natural fibers designed for comfortable all-day wear."
+        viewAllHref={routes.collection("new-arrivals")}
+        viewAllLabel="Shop All New In"
         products={displayRailProducts}
         routes={routes}
         capabilities={capabilities}
+        onQuickAdd={onQuickAdd}
         linkComponent={linkComponent}
       />
 
-      {/* Brand Heritage Story */}
-      <BrandStorySection routes={routes} linkComponent={linkComponent} />
+      {/* 4. Dhaka Craftsmanship & Fabric Story */}
+      <CraftsmanshipSection routes={routes} linkComponent={linkComponent} />
 
-      {/* Secondary Product Rail (Best Sellers) */}
+      {/* 5. Best Sellers Rail */}
       {bestSellers.length > 0 && (
         <ProductRails
           title="Iconic Bestsellers"
-          subtitle="Our most sought-after essentials, tested and perfected for daily wear."
+          subtitle="Our foundational menswear essentials, refined through hundreds of prototype iterations."
           viewAllHref={routes.collection("best-sellers")}
+          viewAllLabel="Shop Bestsellers"
           products={bestSellers}
           routes={routes}
           capabilities={capabilities}
+          onQuickAdd={onQuickAdd}
           linkComponent={linkComponent}
         />
       )}
 
-      {/* Delivery & Service Guarantees */}
+      {/* 6. Split Promotional / Campaign Section */}
+      <SplitPromoSection routes={routes} linkComponent={linkComponent} />
+
+      {/* 7. Brand Story / Values Grid */}
+      <BrandValuesGrid />
+
+      {/* 8. Delivery & Service Reassurance Strip */}
       <DeliveryGuaranteesSection />
 
-      {/* Newsletter */}
+      {/* 9. Newsletter / Private Members Club */}
       {newsletterSlot || <NewsletterSection />}
     </div>
   )
