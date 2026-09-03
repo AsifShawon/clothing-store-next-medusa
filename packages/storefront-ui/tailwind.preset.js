@@ -13,13 +13,18 @@ module.exports = {
       colors: {
         brand: {
           primary: "#111111",
-          secondary: "#F5F1E8",
+          secondary: "#F7F3EA",
           accent: "#1E4937",
           "accent-alt": "#7A2E3A",
-          muted: "#CFC4B5",
+          muted: "#76726B",
+          "muted-light": "#A8A299",
           surface: "#FFFFFF",
           card: "#FAFAF7",
           border: "#E7E2D8",
+          "border-light": "#F0ECE1",
+          sand: "#CFC4B5",
+          ivory: "#F7F3EA",
+          subtle: "#F3EFE6",
         },
         grey: {
           0: "#FFFFFF",
@@ -37,14 +42,25 @@ module.exports = {
       },
       borderRadius: {
         none: "0px",
-        soft: "2px",
-        base: "4px",
+        soft: "4px",
+        base: "6px",
         rounded: "8px",
-        large: "16px",
+        panel: "16px",
+        canvas: "20px",
+        large: "24px",
+        pill: "9999px",
         circle: "9999px",
       },
       maxWidth: {
         "8xl": "100rem",
+        editorial: "1600px",
+        content: "1440px",
+        narrow: "1120px",
+      },
+      boxShadow: {
+        subtle: "0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)",
+        editorial: "0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.02)",
+        mega: "0 20px 40px -15px rgba(0, 0, 0, 0.08)",
       },
       screens: {
         "2xsmall": "320px",
@@ -52,7 +68,7 @@ module.exports = {
         small: "1024px",
         medium: "1280px",
         large: "1440px",
-        xlarge: "1680px",
+        xlarge: "1600px",
         "2xlarge": "1920px",
       },
       fontSize: {

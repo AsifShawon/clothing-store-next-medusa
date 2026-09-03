@@ -21,6 +21,11 @@ export const storefrontTailwindPreset = {
         visibility: "visibility",
         padding: "padding-top padding-right padding-bottom padding-left",
       },
+      boxShadow: {
+        subtle: "0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)",
+        editorial: "0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.02)",
+        mega: "0 20px 40px -15px rgba(0, 0, 0, 0.08)",
+      },
       keyframes: {
         ring: {
           "0%": { transform: "rotate(0deg)" },
@@ -38,6 +43,10 @@ export const storefrontTailwindPreset = {
           "0%": { height: "100%" },
           "99%": { height: "0" },
           "100%": { visibility: "hidden" },
+        },
+        "mega-enter": {
+          "0%": { opacity: "0", transform: "translateY(-4px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "accordion-slide-up": {
           "0%": { height: "var(--radix-accordion-content-height)", opacity: "1" },
@@ -65,6 +74,7 @@ export const storefrontTailwindPreset = {
         "fade-in-right": "fade-in-right 0.3s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "fade-in-top": "fade-in-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "fade-out-top": "fade-out-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
+        "mega-enter": "mega-enter 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "accordion-open": "accordion-slide-down 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards",
         "accordion-close": "accordion-slide-up 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards",
         enter: "enter 200ms ease-out",

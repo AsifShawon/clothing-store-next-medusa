@@ -49,15 +49,35 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10;
+  }
+
+  .editorial-container {
+    @apply max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-12;
   }
 
   .contrast-btn {
-    @apply px-6 py-3 border border-brand-primary rounded-none bg-brand-primary text-white hover:bg-brand-primary/90 transition-colors duration-200 font-medium text-sm;
+    @apply px-6 py-3 rounded-none bg-brand-primary text-white hover:bg-black transition-colors duration-200 font-heading font-semibold text-xs uppercase tracking-wider;
+  }
+
+  .pill-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 bg-brand-primary text-white hover:bg-black font-heading font-semibold text-xs uppercase tracking-wider transition-all duration-200 shadow-subtle hover:shadow-editorial;
+  }
+
+  .pill-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 bg-white hover:bg-brand-secondary text-brand-primary border border-brand-border font-heading font-semibold text-xs uppercase tracking-wider transition-all duration-200;
   }
 
   .badge-tag {
-    @apply inline-flex items-center px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-brand-secondary text-brand-accent border border-brand-muted/40;
+    @apply inline-flex items-center px-2.5 py-0.5 text-[10px] font-heading font-semibold tracking-widest uppercase bg-brand-secondary text-brand-accent border border-brand-border/70 rounded-full;
+  }
+
+  .editorial-chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-heading font-medium tracking-wide bg-brand-secondary/80 text-brand-primary border border-brand-border/60 rounded-full transition-colors hover:border-brand-primary/40;
+  }
+
+  .image-canvas-editorial {
+    @apply relative overflow-hidden rounded-2xl border border-brand-border/60 bg-brand-secondary;
   }
 
   .text-xsmall-regular {

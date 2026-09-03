@@ -1,13 +1,17 @@
 export const brandColors = {
   primary: "#111111",
-  secondary: "#F5F1E8",
+  secondary: "#F7F3EA",
   accent: "#1E4937",
   "accent-alt": "#7A2E3A",
-  muted: "#CFC4B5",
+  muted: "#76726B",
+  "muted-light": "#A8A299",
   surface: "#FFFFFF",
   card: "#FAFAF7",
   border: "#E7E2D8",
+  "border-light": "#F0ECE1",
   sand: "#CFC4B5",
+  ivory: "#F7F3EA",
+  subtle: "#F3EFE6",
 } as const
 
 export const greyColors = {
