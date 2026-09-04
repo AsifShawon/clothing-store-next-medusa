@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PolicyView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
@@ -73,7 +72,6 @@ export default async function PrivacyPolicyPage(props: Props) {
         subtitle="Your privacy and data security are fundamental to how we build our clothing brand."
         sections={PRIVACY_SECTIONS}
         routes={routes}
-        linkComponent={LocalizedClientLink}
       />
     </>
   )

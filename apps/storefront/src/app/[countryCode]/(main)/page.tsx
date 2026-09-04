@@ -6,7 +6,6 @@ import { getRegion } from "@lib/data/regions"
 import { HomeView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "@adapters/medusa/routes"
 import { toCategoryView, toProductView } from "@adapters/medusa/catalog"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { DEFAULT_MEDUSA_CAPABILITIES } from "@dtc/commerce-contracts"
 
 type Props = {
@@ -51,7 +50,6 @@ export default async function Home(props: {
       categories={categories}
       routes={routes}
       capabilities={DEFAULT_MEDUSA_CAPABILITIES}
-      linkComponent={LocalizedClientLink}
     />
   )
 }

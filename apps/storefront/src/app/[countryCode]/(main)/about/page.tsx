@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { AboutView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
@@ -32,7 +31,7 @@ export default async function AboutPage(props: Props) {
   return (
     <>
       <JsonLd data={breadcrumbsSchema} />
-      <AboutView routes={routes} linkComponent={LocalizedClientLink} />
+      <AboutView routes={routes} />
     </>
   )
 }

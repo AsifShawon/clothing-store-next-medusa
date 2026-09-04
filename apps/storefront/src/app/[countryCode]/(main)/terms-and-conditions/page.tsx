@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PolicyView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
@@ -73,7 +72,6 @@ export default async function TermsPage(props: Props) {
         subtitle="Please read these terms carefully before placing an order on londonboy.uk."
         sections={TERMS_SECTIONS}
         routes={routes}
-        linkComponent={LocalizedClientLink}
       />
     </>
   )

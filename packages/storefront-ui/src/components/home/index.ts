@@ -1,6 +1,7 @@
 export * from "./HeroSection"
 export * from "./FeaturedCategories"
 export * from "./ProductRails"
+export * from "./ProductRailScroller"
 export * from "./CraftsmanshipSection"
 export * from "./SplitPromoSection"
 export * from "./BrandStorySection"

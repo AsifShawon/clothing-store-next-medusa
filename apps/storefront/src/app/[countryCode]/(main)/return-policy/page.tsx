@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PolicyView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
@@ -78,7 +77,6 @@ export default async function ReturnPolicyPage(props: Props) {
         subtitle="We want you to feel confident in every stitch. If the size or fit isn't perfect, we make returns and exchanges straightforward."
         sections={RETURN_SECTIONS}
         routes={routes}
-        linkComponent={LocalizedClientLink}
       />
     </>
   )

@@ -1,7 +1,6 @@
 import { Metadata } from "next"
 import { constructMetadata, getBreadcrumbSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PolicyView } from "@dtc/storefront-ui"
 import { createMedusaRoutes } from "../../../../adapters/medusa/routes"
 
@@ -87,7 +86,6 @@ export default async function ShippingPolicyPage(props: Props) {
         subtitle="Direct dispatch from our Dhaka Central Warehouse with transparent tiered pricing across all 64 districts of Bangladesh."
         sections={SHIPPING_SECTIONS}
         routes={routes}
-        linkComponent={LocalizedClientLink}
       />
     </>
   )

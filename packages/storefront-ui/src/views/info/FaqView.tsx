@@ -101,13 +101,15 @@ export const DEFAULT_FAQ_DATA: FaqCategory[] = [
 
 export interface FaqViewProps {
   faqData?: FaqCategory[]
-  routes: StoreRoutes
+  routes?: StoreRoutes
+  contactHref?: string
   linkComponent?: LinkComponent
 }
 
 export function FaqView({
   faqData = DEFAULT_FAQ_DATA,
   routes,
+  contactHref,
   linkComponent: LinkComp = Link,
 }: FaqViewProps) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -214,7 +216,7 @@ export function FaqView({
             </p>
           </div>
           <LinkComp
-            href={routes.contact()}
+            href={contactHref || (routes ? routes.contact() : "/contact")}
             className="px-5 py-2.5 bg-brand-primary text-white font-heading font-semibold uppercase tracking-wider text-xs hover:bg-black transition-colors"
           >
             Contact Customer Support

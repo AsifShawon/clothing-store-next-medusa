@@ -7,7 +7,7 @@ import { ShieldCheckIcon } from "../../components/icons"
 import { LinkComponent } from "../../types"
 
 export interface SizeGuideViewProps {
-  routes: StoreRoutes
+  routes?: StoreRoutes
   linkComponent?: LinkComponent
 }
 

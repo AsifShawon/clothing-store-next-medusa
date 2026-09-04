@@ -9,7 +9,10 @@ import { Input } from "../../components/ui/input"
 import { LinkComponent } from "../../types"
 
 export interface ContactViewProps {
-  routes: StoreRoutes
+  routes?: StoreRoutes
+  shippingPolicyHref?: string
+  returnPolicyHref?: string
+  faqHref?: string
   onSubmitInquiry?: (data: {
     name: string
     email: string
@@ -22,6 +25,9 @@ export interface ContactViewProps {
 
 export function ContactView({
   routes,
+  shippingPolicyHref,
+  returnPolicyHref,
+  faqHref,
   onSubmitInquiry,
   linkComponent: LinkComp = Link,
 }: ContactViewProps) {
@@ -119,19 +125,19 @@ export function ContactView({
               </span>
               <div className="flex flex-wrap gap-2 text-xs">
                 <LinkComp
-                  href={routes.shippingPolicy()}
+                  href={shippingPolicyHref || (routes ? routes.shippingPolicy() : "/shipping-policy")}
                   className="px-3 py-1 bg-brand-secondary border border-brand-border text-brand-primary hover:border-brand-primary"
                 >
                   Shipping Rates (৳60 / ৳100 / ৳130)
                 </LinkComp>
                 <LinkComp
-                  href={routes.returnPolicy()}
+                  href={returnPolicyHref || (routes ? routes.returnPolicy() : "/return-policy")}
                   className="px-3 py-1 bg-brand-secondary border border-brand-border text-brand-primary hover:border-brand-primary"
                 >
                   24h Return Policy
                 </LinkComp>
                 <LinkComp
-                  href={routes.faq()}
+                  href={faqHref || (routes ? routes.faq() : "/faq")}
                   className="px-3 py-1 bg-brand-secondary border border-brand-border text-brand-primary hover:border-brand-primary"
                 >
                   FAQ Knowledge Base

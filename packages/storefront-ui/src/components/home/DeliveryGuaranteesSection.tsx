@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import { BadgeCheckIcon, ShieldCheckIcon, TruckIcon, SparklesIcon } from "../icons"
 
