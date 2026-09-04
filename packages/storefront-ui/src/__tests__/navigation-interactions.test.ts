@@ -1,6 +1,7 @@
 import { test, describe } from "node:test"
 import assert from "node:assert/strict"
 import { createStoreNavigation } from "../components/layout/navigation-model"
+import { deduplicateFooterLinks } from "../components/layout/footer-model"
 import { StoreRoutes } from "@dtc/commerce-contracts"
 
 const mockRoutes: StoreRoutes = {
@@ -115,5 +116,26 @@ describe("Shared Mega Navigation IA & Interaction Suite", () => {
     assert.equal(activeId, "trousers")
     switchMenu("accessories")
     assert.equal(activeId, "accessories")
+  })
+
+  test("6. Footer links with duplicate hrefs are deduplicated to avoid key collisions", () => {
+    const rawLinks = [
+      { label: "New Arrivals", href: "/collections/new-arrivals" },
+      { label: "Best Sellers", href: "/collections/best-sellers" },
+      { label: "New Arrivals (Duplicate)", href: "/collections/new-arrivals" },
+      { label: "The Essentials Edit", href: "/collections/essentials" },
+    ]
+
+    const deduped = deduplicateFooterLinks(rawLinks)
+    assert.equal(deduped.length, 3)
+    assert.deepEqual(
+      deduped.map((l) => l.href),
+      [
+        "/collections/new-arrivals",
+        "/collections/best-sellers",
+        "/collections/essentials",
+      ]
+    )
+    assert.equal(deduped[0].label, "New Arrivals")
   })
 })

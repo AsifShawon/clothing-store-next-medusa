@@ -3,9 +3,20 @@
 import React from "react"
 import Link from "next/link"
 
-export interface FooterLinkItem {
-  label: string
-  href: string
+import {
+  FooterLinkItem,
+  DEFAULT_CATEGORIES,
+  DEFAULT_COLLECTIONS,
+  DEFAULT_CUSTOMER_CARE,
+  deduplicateFooterLinks,
+} from "./footer-model"
+
+export type { FooterLinkItem }
+export {
+  DEFAULT_CATEGORIES,
+  DEFAULT_COLLECTIONS,
+  DEFAULT_CUSTOMER_CARE,
+  deduplicateFooterLinks,
 }
 
 export interface FooterProps {
@@ -18,32 +29,6 @@ export interface FooterProps {
   linkComponent?: React.ComponentType<{ href: string; className?: string; children?: React.ReactNode; [key: string]: unknown }>
 }
 
-const DEFAULT_CATEGORIES: FooterLinkItem[] = [
-  { label: "Shirts & Tailoring", href: "/category?handle=shirts" },
-  { label: "Polos & Heavyweight Tees", href: "/shop" },
-  { label: "Mayfair Chinos & Trousers", href: "/category?handle=chinos" },
-  { label: "French Linen Collection", href: "/category?handle=women" },
-  { label: "Caps & Accessories", href: "/category?handle=accessories" },
-]
-
-const DEFAULT_COLLECTIONS: FooterLinkItem[] = [
-  { label: "New Arrivals", href: "/collection?handle=new-arrivals" },
-  { label: "Iconic Bestsellers", href: "/collection?handle=best-sellers" },
-  { label: "The Wardrobe Essentials", href: "/collection?handle=essentials" },
-  { label: "All Garments", href: "/shop" },
-]
-
-const DEFAULT_CUSTOMER_CARE: FooterLinkItem[] = [
-  { label: "Size & Fit Guide", href: "/size-guide" },
-  { label: "Frequently Asked Questions (FAQ)", href: "/faq" },
-  { label: "Our Story & Craftsmanship", href: "/about" },
-  { label: "Customer Concierge", href: "/contact" },
-  { label: "Shipping & Delivery Rates", href: "/shipping-policy" },
-  { label: "24-Hour Easy Exchanges", href: "/return-policy" },
-  { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms & Conditions", href: "/terms-and-conditions" },
-]
-
 export function Footer({
   homeHref = "/",
   categories = DEFAULT_CATEGORIES,
@@ -52,6 +37,10 @@ export function Footer({
   customControlsSlot,
   linkComponent: LinkComp = Link,
 }: FooterProps) {
+  const displayCollections = deduplicateFooterLinks(collections)
+  const displayCategories = deduplicateFooterLinks(categories)
+  const displayCustomerCareLinks = deduplicateFooterLinks(customerCareLinks)
+
   return (
     <footer className="bg-brand-primary text-brand-secondary border-t border-white/10 w-full mt-auto">
       {/* Upper Reassurance Strip */}
@@ -120,7 +109,7 @@ export function Footer({
               Collections
             </h4>
             <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
-              {collections.map((col) => (
+              {displayCollections.map((col) => (
                 <li key={col.href}>
                   <LinkComp href={col.href} className="hover:text-white transition-colors">
                     {col.label}
@@ -136,7 +125,7 @@ export function Footer({
               Departments
             </h4>
             <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
-              {categories.map((cat) => (
+              {displayCategories.map((cat) => (
                 <li key={cat.href}>
                   <LinkComp href={cat.href} className="hover:text-white transition-colors">
                     {cat.label}
@@ -152,7 +141,7 @@ export function Footer({
               Client Concierge &amp; Care
             </h4>
             <ul className="space-y-2 text-xs text-brand-sand/80 font-sans">
-              {customerCareLinks.map((item) => (
+              {displayCustomerCareLinks.map((item) => (
                 <li key={item.href}>
                   <LinkComp href={item.href} className="hover:text-white transition-colors">
                     {item.label}

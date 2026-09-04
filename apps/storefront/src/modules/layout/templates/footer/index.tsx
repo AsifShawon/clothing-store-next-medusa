@@ -9,26 +9,42 @@ export default async function Footer() {
   })
   const productCategories = await listCategories()
 
-  const categories = [
+  const defaultCategories = [
     { label: "All Clothing", href: "/store" },
     { label: "Men's Collection", href: "/categories/men" },
     { label: "Women's Edit", href: "/categories/women" },
     { label: "Caps & Accessories", href: "/categories/accessories" },
-    ...(productCategories?.slice(0, 3).map((cat) => ({
-      label: cat.name,
-      href: `/categories/${cat.handle}`,
-    })) || []),
   ]
 
-  const collectionsList = [
+  const categoriesMap = new Map<string, { label: string; href: string }>()
+  for (const item of defaultCategories) {
+    categoriesMap.set(item.href, item)
+  }
+  for (const cat of productCategories || []) {
+    const href = `/categories/${cat.handle}`
+    if (!categoriesMap.has(href)) {
+      categoriesMap.set(href, { label: cat.name, href })
+    }
+  }
+  const categories = Array.from(categoriesMap.values()).slice(0, 6)
+
+  const defaultCollections = [
     { label: "New Arrivals", href: "/collections/new-arrivals" },
     { label: "Best Sellers", href: "/collections/best-sellers" },
     { label: "The Essentials Edit", href: "/collections/essentials" },
-    ...(collections?.map((col) => ({
-      label: col.title,
-      href: `/collections/${col.handle}`,
-    })) || []),
   ]
+
+  const collectionsMap = new Map<string, { label: string; href: string }>()
+  for (const item of defaultCollections) {
+    collectionsMap.set(item.href, item)
+  }
+  for (const col of collections || []) {
+    const href = `/collections/${col.handle}`
+    if (!collectionsMap.has(href)) {
+      collectionsMap.set(href, { label: col.title, href })
+    }
+  }
+  const collectionsList = Array.from(collectionsMap.values())
 
   return (
     <SharedFooter
