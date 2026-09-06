@@ -61,6 +61,19 @@ export function MobileNavDrawer({
             <span>Reset Demo Store Data</span>
           </button>
 
+          <button
+            type="button"
+            onClick={() => {
+              onClose()
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("lb:reopen-demo-banner"))
+              }
+            }}
+            className="w-full py-2 text-center text-xs font-heading text-brand-muted hover:text-brand-primary underline transition-colors"
+          >
+            Reopen Top Demo Notice
+          </button>
+
           <div className="text-[10px] font-heading font-medium text-center text-grey-50 pt-1">
             London Boy Portfolio Demo • Zero Backend
           </div>

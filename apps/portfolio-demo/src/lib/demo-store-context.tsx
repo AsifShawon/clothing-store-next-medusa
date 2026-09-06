@@ -200,7 +200,7 @@ export function useDemoProduct(handleOrId?: string | null) {
  * Cart management hook with automatic quantity merging and bounds checking
  */
 export function useDemoCart() {
-  const { state, updateStore, setIsCartDrawerOpen, showToast } = useDemoStore()
+  const { state, updateStore, showToast } = useDemoStore()
 
   const appliedPromo = useMemo(() => {
     if (!state.cart.appliedPromotionCode) return undefined
@@ -229,21 +229,40 @@ export function useDemoCart() {
   const total = Math.max(0, subtotal - discount)
 
   const addItem = useCallback(
-    (product: DemoProduct, variant: DemoProductVariant, quantity: number = 1) => {
+    (
+      product: DemoProduct,
+      variant: DemoProductVariant,
+      quantity: number = 1
+    ): { success: boolean; message?: string } => {
+      const maxStock = variant.manageInventory ? variant.inventoryQuantity : 99
+
+      if (maxStock <= 0) {
+        showToast("Out of Stock", `${product.title} (${variant.title}) is currently unavailable.`, "error")
+        return { success: false, message: "Garment is out of stock" }
+      }
+
+      let success = true
+      let failMessage: string | undefined
+
       updateStore((draft) => {
         const existingIdx = draft.cart.items.findIndex((item) => item.variantId === variant.id)
-        const maxStock = variant.manageInventory ? variant.inventoryQuantity : 99
+        const currentQty = existingIdx > -1 ? draft.cart.items[existingIdx].quantity : 0
 
-        if (maxStock <= 0) {
-          showToast("Out of Stock", `${product.title} (${variant.title}) is currently unavailable.`, "error")
+        if (currentQty >= maxStock) {
+          success = false
+          failMessage = `All available stock (${maxStock}) is already in your bag.`
+          return draft
+        }
+
+        const addQty = Math.min(quantity, maxStock - currentQty)
+        if (addQty <= 0) {
+          success = false
+          failMessage = `Cannot add more than ${maxStock} items.`
           return draft
         }
 
         if (existingIdx > -1) {
-          // Merge line quantities up to available stock
-          const currentQty = draft.cart.items[existingIdx].quantity
-          const newQty = Math.min(currentQty + quantity, maxStock)
-          draft.cart.items[existingIdx].quantity = newQty
+          draft.cart.items[existingIdx].quantity = currentQty + addQty
           draft.cart.items[existingIdx].maxInventory = maxStock
         } else {
           const newItem: DemoCartItem = {
@@ -256,7 +275,7 @@ export function useDemoCart() {
             sku: variant.sku,
             options: variant.options,
             unitPrice: variant.price,
-            quantity: Math.min(quantity, maxStock),
+            quantity: addQty,
             thumbnail: product.thumbnail || product.images[0] || "",
             maxInventory: maxStock,
           }
@@ -266,10 +285,15 @@ export function useDemoCart() {
         return draft
       })
 
+      if (!success) {
+        showToast("Stock limit reached", failMessage, "error")
+        return { success: false, message: failMessage }
+      }
+
       showToast("Added to bag", `${product.title} (${variant.title})`, "success")
-      setIsCartDrawerOpen(true)
+      return { success: true }
     },
-    [updateStore, showToast, setIsCartDrawerOpen]
+    [updateStore, showToast]
   )
 
   const updateItemQuantity = useCallback(

@@ -115,4 +115,82 @@ describe("Product Card & Quick Add Interaction Suite", () => {
     assert.equal(res.success, false)
     assert.equal(res.message, "Variant stock limit reached")
   })
+
+  test("4. Unique size count computes distinct sizes instead of total variant combinations", () => {
+    // A product with 2 colors and 3 sizes has 6 variants, but only 3 distinct sizes
+    const productWithVariants: ProductView = {
+      ...mockProduct,
+      options: [
+        { id: "opt_col", title: "Color", values: ["White", "Black"] },
+        { id: "opt_sz", title: "Size", values: ["S", "M", "L"] },
+      ],
+      variants: [
+        { id: "1", title: "W/S", sku: "1", options: { Color: "White", Size: "S" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+        { id: "2", title: "W/M", sku: "2", options: { Color: "White", Size: "M" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+        { id: "3", title: "W/L", sku: "3", options: { Color: "White", Size: "L" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+        { id: "4", title: "B/S", sku: "4", options: { Color: "Black", Size: "S" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+        { id: "5", title: "B/M", sku: "5", options: { Color: "Black", Size: "M" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+        { id: "6", title: "B/L", sku: "6", options: { Color: "Black", Size: "L" }, inStock: true, price: { amount: 1000, formatted: "৳1,000", currencyCode: "bdt" } },
+      ],
+    }
+
+    const sizeOption = productWithVariants.options?.find((o) => o.title.toLowerCase() === "size")
+    const uniqueSizes = sizeOption?.values?.length ?? new Set(productWithVariants.variants.map((v) => v.options["Size"])).size
+
+    assert.equal(uniqueSizes, 3) // S, M, L
+    assert.equal(productWithVariants.variants.length, 6)
+    assert.notEqual(uniqueSizes, productWithVariants.variants.length)
+  })
+
+  test("5. Color-specific primary image resolves based on selected swatch", () => {
+    const productWithColorImages: ProductView = {
+      ...mockProduct,
+      images: [
+        { id: "img_white", url: "https://example.com/white.jpg", altText: "White Shirt" },
+        { id: "img_black", url: "https://example.com/black.jpg", altText: "Black Shirt" },
+      ],
+    }
+
+    function resolvePrimaryImage(selectedColor: string) {
+      const match = productWithColorImages.images.find((img) =>
+        img.altText?.toLowerCase().includes(selectedColor.toLowerCase())
+      )
+      return match || productWithColorImages.thumbnail || productWithColorImages.images[0]
+    }
+
+    assert.equal(resolvePrimaryImage("Black").url, "https://example.com/black.jpg")
+    assert.equal(resolvePrimaryImage("White").url, "https://example.com/white.jpg")
+    assert.equal(resolvePrimaryImage("Sky Blue").url, productWithColorImages.thumbnail?.url)
+  })
+
+  test("6. Variant selection resets invalid size when switching colors", () => {
+    // If White has [S, M, L] and Black only has [S]
+    let selectedColor = "White"
+    let selectedSize: string | null = "L"
+
+    function selectColor(newColor: string) {
+      selectedColor = newColor
+      // Check if current selectedSize is available in newColor
+      const hasSizeInNewColor = mockProduct.variants.some(
+        (v) =>
+          v.options["Color"]?.toLowerCase() === newColor.toLowerCase() &&
+          v.options["Size"]?.toLowerCase() === selectedSize?.toLowerCase()
+      )
+      if (!hasSizeInNewColor) {
+        selectedSize = null
+      }
+    }
+
+    assert.equal(selectedSize, "L")
+    selectColor("Black")
+    // Black does not have size L, so selectedSize must be cleared to null
+    assert.equal(selectedSize, null)
+
+    // Selecting White again and choosing S
+    selectColor("White")
+    selectedSize = "S"
+    // Switching to Black (which DOES have S) preserves size S
+    selectColor("Black")
+    assert.equal(selectedSize, "S")
+  })
 })

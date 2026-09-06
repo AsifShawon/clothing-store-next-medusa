@@ -1,6 +1,6 @@
 import React from "react"
 import type { Metadata } from "next"
-import { DM_Serif_Display, Manrope, Inter } from "next/font/google"
+import { DM_Serif_Display, Manrope } from "next/font/google"
 import { DemoProvider } from "@lib/demo-context"
 import { DemoBanner } from "@components/common/demo-banner"
 import { StorefrontHeader } from "@components/common/header"
@@ -23,12 +23,6 @@ const manrope = Manrope({
   display: "swap",
 })
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-})
-
 export const metadata: Metadata = {
   title: {
     default: "London Boy | Modern British Clothing (Portfolio Demo)",
@@ -42,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${dmSerif.variable} ${manrope.variable} ${inter.variable}`}
+      className={`${dmSerif.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
       <body

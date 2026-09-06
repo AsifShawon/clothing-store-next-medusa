@@ -35,6 +35,7 @@ export default function NavHeader({
         cartHref="/cart"
         accountHref="/account"
         cartCountNode={cartCountNode}
+        announcementText=""
         onOpenSearch={() => setIsSearchOpen(true)}
         linkComponent={LocalizedClientLink}
         mobileMenuSlot={<SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />}

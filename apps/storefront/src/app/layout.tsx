@@ -3,7 +3,7 @@ import { getOrganizationSchema } from "@lib/util/seo"
 import JsonLd from "@modules/common/components/json-ld"
 import SkipLink from "@modules/layout/components/skip-link"
 import { Metadata } from "next"
-import { DM_Serif_Display, Manrope, Inter } from "next/font/google"
+import { DM_Serif_Display, Manrope } from "next/font/google"
 import "styles/globals.css"
 
 const dmSerif = DM_Serif_Display({
@@ -16,12 +16,6 @@ const dmSerif = DM_Serif_Display({
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
-  display: "swap",
-})
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
   display: "swap",
 })
 
@@ -56,7 +50,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html
       lang="en"
       data-mode="light"
-      className={`${dmSerif.variable} ${manrope.variable} ${inter.variable}`}
+      className={`${dmSerif.variable} ${manrope.variable}`}
     >
       <head>
         <JsonLd data={organizationSchema} />

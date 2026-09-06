@@ -16,7 +16,7 @@ export default async function Nav() {
   ])
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 shadow-sm">
+    <div className="relative z-40">
       <AnnouncementBar />
       <NavHeader
         regions={regions}

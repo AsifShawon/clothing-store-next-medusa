@@ -47,14 +47,14 @@ export function CartDrawer({
       position="right"
       maxWidth="md"
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Free Shipping Progress Meter (when items exist) */}
         {items.length > 0 && (
-          <div className="p-3.5 mb-4 bg-brand-secondary/70 border border-brand-border/80 rounded-xl space-y-2">
+          <div className="p-3.5 mb-3 bg-brand-secondary/70 border border-brand-border/80 rounded-xl space-y-2 flex-shrink-0">
             <div className="flex items-center justify-between text-xs">
               {isFreeShipping ? (
                 <span className="font-heading font-bold text-emerald-800 flex items-center gap-1.5">
-                  <CheckIcon className="w-3.5 h-3.5 text-emerald-700" />
+                  <CheckIcon className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
                   <span>Free Dhaka Express Delivery Unlocked!</span>
                 </span>
               ) : (
@@ -62,7 +62,7 @@ export function CartDrawer({
                   Add <strong>৳{remaining.toLocaleString()}</strong> more for Free Delivery
                 </span>
               )}
-              <span className="font-mono text-[10px] text-brand-muted">{progress}%</span>
+              <span className="font-mono text-[10px] text-brand-muted tabular-nums">{progress}%</span>
             </div>
             <div className="w-full h-1.5 bg-brand-border/60 rounded-full overflow-hidden">
               <div
@@ -75,15 +75,15 @@ export function CartDrawer({
           </div>
         )}
 
-        {/* Items list */}
-        <div className="flex-1 overflow-y-auto divide-y divide-brand-border/70 pr-1">
+        {/* Scrollable Items list */}
+        <div className="flex-1 overflow-y-auto divide-y divide-brand-border/70 pr-1 overscroll-contain">
           {items.length === 0 ? (
-            <div className="py-20 text-center space-y-4">
+            <div className="py-16 text-center space-y-4 my-auto">
               <ShoppingBagIcon className="w-10 h-10 text-brand-muted mx-auto" />
               <p className="font-heading font-semibold text-sm text-brand-primary">
                 Your bag is empty
               </p>
-              <p className="text-xs text-brand-muted max-w-xs mx-auto font-sans">
+              <p className="text-xs text-brand-muted max-w-xs mx-auto font-sans leading-relaxed">
                 Explore our British tailoring and heavyweight cotton essentials.
               </p>
               <div className="pt-2">
@@ -110,22 +110,22 @@ export function CartDrawer({
           )}
         </div>
 
-        {/* Footer Subtotal & Actions */}
+        {/* Pinned Footer Subtotal & Actions */}
         {items.length > 0 && cart && (
-          <div className="border-t border-brand-border/80 pt-4 space-y-4 bg-white mt-auto">
-            <div className="flex justify-between items-baseline text-xs">
-              <span className="font-heading uppercase tracking-wider text-brand-muted">
+          <div className="border-t border-brand-border/80 pt-4 space-y-3 bg-[#FAFAF7] mt-auto flex-shrink-0">
+            <div className="flex justify-between items-baseline text-xs px-1">
+              <span className="font-heading font-semibold uppercase tracking-wider text-brand-muted">
                 Subtotal
               </span>
-              <span className="font-heading font-bold text-sm text-brand-primary">
+              <span className="font-heading font-bold text-base text-brand-primary tabular-nums">
                 {cart.totals.subtotal.formatted}
               </span>
             </div>
-            <p className="text-[11px] text-brand-muted font-sans">
+            <p className="text-[11px] text-brand-muted font-sans px-1">
               Dhaka express shipping &amp; promotions calculated at checkout.
             </p>
 
-            <div className="space-y-2">
+            <div className="space-y-2 pt-1">
               {onProceedToCheckout ? (
                 <Button
                   type="button"
@@ -151,7 +151,7 @@ export function CartDrawer({
               <LinkComp
                 href={routes.cart()}
                 onClick={onClose}
-                className="w-full h-11 rounded-full border border-brand-border hover:border-brand-primary text-brand-primary text-xs font-heading font-semibold uppercase tracking-wider flex items-center justify-center transition-colors"
+                className="w-full h-11 rounded-full border border-brand-border hover:border-brand-primary bg-white text-brand-primary text-xs font-heading font-semibold uppercase tracking-wider flex items-center justify-center transition-colors"
               >
                 View Full Bag
               </LinkComp>

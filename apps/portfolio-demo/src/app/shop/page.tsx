@@ -3,7 +3,7 @@
 import React, { useState, useMemo, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { useDemoProducts, useDemoCart, useDemoStore } from "@lib/demo-store-context"
+import { useDemoProducts, useDemoCart } from "@lib/demo-store-context"
 import { CatalogView } from "@dtc/storefront-ui"
 import {
   ProductFilterView,
@@ -22,7 +22,6 @@ function ShopContent() {
 
   const { allProducts, categories } = useDemoProducts()
   const { addItem } = useDemoCart()
-  const { setIsCartDrawerOpen } = useDemoStore()
 
   const [filters, setFilters] = useState<ProductFilterView>({
     search: initialSearch,
@@ -128,9 +127,7 @@ function ShopContent() {
       if (!prod || !variant) {
         return { success: false, message: "Garment or size not found" }
       }
-      addItem(prod, variant, req.quantity)
-      setIsCartDrawerOpen(true)
-      return { success: true }
+      return addItem(prod, variant, req.quantity)
     } catch (err: unknown) {
       return {
         success: false,

@@ -1,8 +1,10 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import Link from "next/link"
 import Image from "next/image"
+import clsx from "clsx"
 import {
   ProductView,
   SearchCategorySuggestion,
@@ -66,7 +68,10 @@ export function SearchOverlay({
   onViewAllResults,
   linkComponent: LinkComp = Link,
 }: SearchOverlayProps) {
+  const [isMounted, setIsMounted] = useState(isOpen)
+  const [isClosing, setIsClosing] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1)
 
   // Calculate flat suggestions list for keyboard navigation
@@ -79,30 +84,54 @@ export function SearchOverlay({
     return list
   }, [querySuggestions, categorySuggestions])
 
-  // Reset highlight on query change or open
-  useEffect(() => {
-    setHighlightedIndex(-1)
-  }, [query, isOpen])
-
-  // Focus input and lock body scroll on open
+  // Manage open / close transitions with animation
   useEffect(() => {
     if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement | null
+      setIsMounted(true)
+      setIsClosing(false)
+      document.body.style.overflow = "hidden"
       const timer = setTimeout(() => {
         inputRef.current?.focus()
       }, 50)
-      document.body.style.overflow = "hidden"
-      return () => {
-        clearTimeout(timer)
+      return () => clearTimeout(timer)
+    } else if (isMounted && !isClosing) {
+      const prefersReduced =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+      if (prefersReduced) {
+        setIsMounted(false)
         document.body.style.overflow = ""
+        triggerRef.current?.focus()
+      } else {
+        setIsClosing(true)
+        const timer = setTimeout(() => {
+          setIsMounted(false)
+          setIsClosing(false)
+          document.body.style.overflow = ""
+          triggerRef.current?.focus()
+        }, 200)
+        return () => clearTimeout(timer)
       }
-    } else {
-      document.body.style.overflow = ""
     }
   }, [isOpen])
 
+  // Cleanup scroll lock
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
+
+  // Reset highlight on query change
+  useEffect(() => {
+    setHighlightedIndex(-1)
+  }, [query])
+
   // Close on Escape key
   useEffect(() => {
-    if (!isOpen) return
+    if (!isMounted) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault()
@@ -111,7 +140,7 @@ export function SearchOverlay({
     }
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen, onClose])
+  }, [isMounted, onClose])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (flatSuggestions.length === 0) return
@@ -156,27 +185,38 @@ export function SearchOverlay({
     }
   }
 
-  if (!isOpen) return null
+  if (!isMounted) return null
 
   const displayCount = totalCount !== undefined ? totalCount : products.length
   const hasQuery = query.trim().length > 0
 
-  return (
+  const overlayContent = (
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Predictive garment search"
-      className="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm animate-mega-enter"
+      className={clsx(
+        "fixed inset-0 z-50 flex flex-col justify-start sm:justify-center p-0 sm:p-4 transition-opacity duration-200",
+        isClosing ? "opacity-0 pointer-events-none" : "opacity-100"
+      )}
     >
       {/* Backdrop click to close */}
       <div
-        className="fixed inset-0"
+        className={clsx(
+          "fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200",
+          isClosing ? "opacity-0" : "opacity-100 animate-fade-in"
+        )}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Main Search Panel Container */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto bg-white shadow-2xl border-b border-brand-border flex flex-col max-h-[92vh] sm:mt-12 sm:rounded-2xl overflow-hidden">
+      <div
+        className={clsx(
+          "relative z-10 w-full max-w-5xl mx-auto bg-white shadow-2xl border-b sm:border border-brand-border flex flex-col max-h-[92vh] sm:rounded-2xl overflow-hidden transition-all duration-200",
+          isClosing ? "scale-98 opacity-0" : "animate-mega-enter"
+        )}
+      >
         {/* Search Header Bar */}
         <div className="p-4 sm:p-6 border-b border-brand-border bg-white flex items-center gap-3">
           <MagnifyingGlassIcon className="w-5 h-5 text-brand-primary/50 flex-shrink-0" />
@@ -196,7 +236,7 @@ export function SearchOverlay({
               onChange={(e) => onQueryChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search garments, 240 GSM cotton, Oxford shirts, chinos..."
-              className="w-full bg-transparent text-sm sm:text-base font-heading text-brand-primary placeholder:text-brand-muted/70 focus:outline-none"
+              className="w-full bg-transparent text-base font-heading text-brand-primary placeholder:text-brand-muted/70 focus:outline-none"
             />
           </form>
 
@@ -448,4 +488,9 @@ export function SearchOverlay({
       </div>
     </div>
   )
+
+  if (typeof document !== "undefined") {
+    return createPortal(overlayContent, document.body)
+  }
+  return overlayContent
 }

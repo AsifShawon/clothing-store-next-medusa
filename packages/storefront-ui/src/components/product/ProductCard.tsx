@@ -43,9 +43,31 @@ export function ProductCard({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
 
-  // Primary and secondary images
-  const primaryImage = product.thumbnail || product.images[0]
-  const secondaryImage = product.images.length > 1 ? product.images[1] : undefined
+  // Color-specific primary and secondary image
+  const primaryImage = useMemo(() => {
+    if (selectedColor) {
+      // 1. Variant image
+      const variantWithColor = product.variants.find(
+        (v) =>
+          (v.options["Color"] || v.options["color"])?.toLowerCase() ===
+          selectedColor.toLowerCase()
+      )
+      if (variantWithColor?.images && variantWithColor.images.length > 0) {
+        return variantWithColor.images[0]
+      }
+      // 2. Alt text match
+      const altMatch = product.images.find((img) =>
+        img.altText?.toLowerCase().includes(selectedColor.toLowerCase())
+      )
+      if (altMatch) return altMatch
+    }
+    return product.thumbnail || product.images[0]
+  }, [product.variants, product.images, product.thumbnail, selectedColor])
+
+  const secondaryImage = useMemo(() => {
+    const candidates = product.images.filter((img) => img.url !== primaryImage?.url)
+    return candidates.length > 0 ? candidates[0] : undefined
+  }, [product.images, primaryImage])
 
   // Stock status
   const isSoldOut =
@@ -58,6 +80,19 @@ export function ProductCard({
 
   const fabricInfo = product.material || product.subtitle || "British Smart-Casual"
 
+  // Unique sizes count
+  const uniqueSizesCount = useMemo(() => {
+    if (sizeOption?.values?.length) {
+      return sizeOption.values.length
+    }
+    const sizeSet = new Set<string>()
+    for (const variant of product.variants) {
+      const sizeVal = variant.options["Size"] || variant.options["size"]
+      if (sizeVal) sizeSet.add(sizeVal)
+    }
+    return sizeSet.size || product.variants.length
+  }, [sizeOption, product.variants])
+
   // Sizes available for the selected color
   const availableSizes = useMemo(() => {
     if (!sizeOption) return []
@@ -65,8 +100,11 @@ export function ProductCard({
       const variant = product.variants.find((v) => {
         const matchColor =
           !colorOption ||
-          v.options["Color"]?.toLowerCase() === selectedColor.toLowerCase()
-        const matchSize = v.options["Size"]?.toLowerCase() === size.toLowerCase()
+          (v.options["Color"] || v.options["color"])?.toLowerCase() ===
+            selectedColor.toLowerCase()
+        const matchSize =
+          (v.options["Size"] || v.options["size"])?.toLowerCase() ===
+          size.toLowerCase()
         return matchColor && matchSize
       })
       return {
@@ -172,7 +210,7 @@ export function ProductCard({
 
           {/* Desktop Quick Add Hover Tray */}
           {onQuickAdd && !isSoldOut && availableSizes.length > 0 && (
-            <div className="hidden lg:flex absolute inset-x-2 bottom-2 z-20 bg-white/95 backdrop-blur-sm border border-brand-border/90 rounded-lg p-2 flex-col gap-1.5 shadow-md transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 transition-all duration-200">
+            <div className="hidden lg:flex absolute inset-x-2 bottom-2 z-20 bg-white/95 backdrop-blur-sm border border-brand-border/90 rounded-lg p-2 flex-col gap-1.5 shadow-md transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-all duration-200">
               <div className="flex items-center justify-between px-1">
                 <span className="text-[10px] font-heading font-bold uppercase tracking-wider text-brand-muted">
                   Quick Add
@@ -208,7 +246,14 @@ export function ProductCard({
                               : "bg-white hover:bg-brand-primary hover:text-white border border-brand-border text-brand-primary"
                       }`}
                     >
-                      {isPending ? "..." : size}
+                      {isPending ? (
+                        <span
+                          className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        size
+                      )}
                     </button>
                   )
                 })}
@@ -234,7 +279,7 @@ export function ProductCard({
           <div className="space-y-1">
             <LinkComp href={href} className="block group-hover:text-brand-accent transition-colors">
               <h3
-                className="font-heading font-bold text-sm text-brand-primary truncate group-hover:underline"
+                className="font-heading font-bold text-sm text-brand-primary line-clamp-2 leading-snug group-hover:underline"
                 data-testid="product-title"
               >
                 {product.title}
@@ -300,9 +345,9 @@ export function ProductCard({
               )}
             </div>
 
-            {product.variants.length > 0 && (
+            {uniqueSizesCount > 0 && (
               <span className="text-[10px] uppercase font-heading font-medium tracking-wider text-brand-muted">
-                {product.variants.length} Sizes
+                {uniqueSizesCount} {uniqueSizesCount === 1 ? "Size" : "Sizes"}
               </span>
             )}
           </div>
@@ -315,6 +360,7 @@ export function ProductCard({
           isOpen={isMobileSheetOpen}
           onClose={() => setIsMobileSheetOpen(false)}
           product={product}
+          initialColor={selectedColor}
           href={href}
           onQuickAdd={onQuickAdd}
           linkComponent={LinkComp}

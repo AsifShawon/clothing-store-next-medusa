@@ -50,8 +50,10 @@ function ProductDetailContent() {
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) return
-    addItem(product, selectedVariant, quantity)
-    setIsCartDrawerOpen(true)
+    const res = addItem(product, selectedVariant, quantity)
+    if (res.success) {
+      setIsCartDrawerOpen(true)
+    }
   }
 
   const handleQuickAdd = async (req: QuickAddRequest): Promise<QuickAddResult> => {
@@ -61,9 +63,7 @@ function ProductDetailContent() {
       if (!prod || !variant) {
         return { success: false, message: "Garment or size not found" }
       }
-      addItem(prod, variant, req.quantity)
-      setIsCartDrawerOpen(true)
-      return { success: true }
+      return addItem(prod, variant, req.quantity)
     } catch (err: unknown) {
       return {
         success: false,

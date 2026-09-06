@@ -21,7 +21,7 @@ test.describe("Shared View Visual & Architectural Layout Harness", () => {
         await expect(logo).toBeVisible()
 
         // Hero CTA button presence
-        const heroCta = page.locator("a:has-text('Collection')").first()
+        const heroCta = page.locator("section a:has-text('Collection')").first()
         await expect(heroCta).toBeVisible()
 
         // Department collections section

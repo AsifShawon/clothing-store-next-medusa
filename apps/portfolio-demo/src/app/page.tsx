@@ -2,7 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
-import { useDemoProducts, useDemoCart, useDemoStore } from "@lib/demo-store-context"
+import { useDemoProducts, useDemoCart } from "@lib/demo-store-context"
 import { HomeView, BuildingStorefrontIcon } from "@dtc/storefront-ui"
 import { toCategoryView, toProductView } from "../adapters/local-storage/catalog"
 import { demoRoutes } from "../adapters/local-storage/routes"
@@ -11,7 +11,6 @@ import { DEFAULT_DEMO_CAPABILITIES, QuickAddRequest, QuickAddResult } from "@dtc
 export default function HomePage() {
   const { products, categories } = useDemoProducts()
   const { addItem } = useDemoCart()
-  const { setIsCartDrawerOpen } = useDemoStore()
 
   const productViews = products.map(toProductView)
   const categoryViews = categories.map(toCategoryView)
@@ -23,9 +22,7 @@ export default function HomePage() {
       if (!prod || !variant) {
         return { success: false, message: "Garment or size not found" }
       }
-      addItem(prod, variant, req.quantity)
-      setIsCartDrawerOpen(true)
-      return { success: true }
+      return addItem(prod, variant, req.quantity)
     } catch (err: unknown) {
       return {
         success: false,

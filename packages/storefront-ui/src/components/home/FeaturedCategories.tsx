@@ -74,10 +74,10 @@ export function FeaturedCategories({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-2 max-w-xl">
             <span className="text-[11px] font-heading font-bold uppercase tracking-widest text-brand-accent">
-              Wardrobe Foundations
+              Wardrobe Departments
             </span>
             <h2 className="font-display text-2xl sm:text-4xl text-brand-primary tracking-tight font-normal">
-              Departments &amp; Categories
+              Shop By Wardrobe Category
             </h2>
             <p className="text-xs sm:text-sm text-brand-muted leading-relaxed">
               Every garment is engineered around specific fabric weights and clean architectural silhouettes.

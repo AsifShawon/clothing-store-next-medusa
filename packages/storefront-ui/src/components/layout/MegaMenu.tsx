@@ -50,13 +50,14 @@ export function MegaMenu({
       ref={panelRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 right-0 z-40 bg-white border-b border-brand-border/80 shadow-mega animate-mega-enter before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
+      style={{ backgroundColor: "#FAFAF7" }}
+      className="absolute top-[calc(100%+8px)] left-0 right-0 z-40 bg-[#FAFAF7] rounded-2xl border border-brand-border/90 shadow-2xl animate-mega-enter before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-[''] overflow-hidden"
     >
-      <div className="content-container py-8 lg:py-10">
+      <div className="content-container py-7 lg:py-8">
         <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Column 1: Featured Links */}
           <div className="col-span-3 space-y-4 border-r border-brand-border/60 pr-6">
-            <span className="text-[11px] font-heading font-bold uppercase tracking-widest text-brand-muted block">
+            <span className="text-xs font-heading font-bold uppercase tracking-wider text-brand-muted block">
               Featured
             </span>
             <ul className="space-y-2">

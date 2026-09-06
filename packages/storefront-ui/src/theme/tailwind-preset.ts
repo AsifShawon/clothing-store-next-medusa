@@ -68,6 +68,30 @@ export const storefrontTailwindPreset = {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "fade-out": {
+          "0%": { opacity: "1" },
+          "100%": { opacity: "0" },
+        },
+        "drawer-enter-right": {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+        "drawer-exit-right": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        "sheet-enter-bottom": {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        "sheet-exit-bottom": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(100%)" },
+        },
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
@@ -80,6 +104,12 @@ export const storefrontTailwindPreset = {
         enter: "enter 200ms ease-out",
         "slide-in": "slide-in 1.2s cubic-bezier(.41,.73,.51,1.02)",
         leave: "leave 150ms ease-in forwards",
+        "fade-in": "fade-in 200ms ease-out forwards",
+        "fade-out": "fade-out 200ms ease-in forwards",
+        "drawer-enter": "drawer-enter-right 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "drawer-exit": "drawer-exit-right 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "sheet-enter": "sheet-enter-bottom 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "sheet-exit": "sheet-exit-bottom 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
     },
   },

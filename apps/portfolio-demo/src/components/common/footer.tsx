@@ -107,6 +107,17 @@ export function StorefrontFooter() {
                 </Link>
                 <button
                   type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new CustomEvent("lb:reopen-demo-banner"))
+                    }
+                  }}
+                  className="text-left text-xs text-brand-sand/80 hover:text-white underline underline-offset-4 transition-colors"
+                >
+                  Reopen Demo Notice Banner
+                </button>
+                <button
+                  type="button"
                   onClick={() => setIsResetOpen(true)}
                   className="text-left text-xs text-rose-300 hover:text-rose-200 flex items-center gap-1 mt-1 transition-colors"
                 >
