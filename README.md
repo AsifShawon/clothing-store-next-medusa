@@ -346,11 +346,17 @@ When importing this Turborepo workspace into Vercel, set the project settings as
 | Setting | Value | Rationale |
 | :--- | :--- | :--- |
 | **Root Directory** | `apps/portfolio-demo` | Scopes deployment to the static demo package |
-| **Framework Preset** | `Next.js` | Automatically applies Next.js optimization and caching |
-| **Build Command** | `pnpm run build` *(or `turbo run build --filter=@dtc/portfolio-demo`)* | Builds static HTML/CSS/JS export into `out/` |
-| **Output Directory** | `out` | Next.js 15 static HTML export destination |
+| **Framework Preset** | `Next.js` | Automatically applies Next.js optimization, edge routing, and caching |
+| **Build Command** | `pnpm run build` *(or `turbo run build --filter=@dtc/portfolio-demo`)* | Builds static HTML/CSS/JS export into `out/` and manifests into `.next/` |
+| **Output Directory** | **Default (Leave toggle OFF)** | Defaults to `.next`. Do NOT override to `out` when using the Next.js framework preset, as Vercel expects internal manifest files (`routes-manifest.json`) in `.next` |
 | **Install Command** | `pnpm install` | Uses pnpm 10.11.1 frozen lockfile from workspace root |
 | **Node.js Version** | `20.x` | Monorepo standard runtime |
+
+> [!NOTE]
+> **Vercel "routes-manifest.json couldn't be found" Troubleshooting**:
+> If you encounter `Error: The file ".../out/routes-manifest.json" couldn't be found`, go to **Vercel Project Settings > General > Build and Output Settings**, and toggle **Output Directory** to **OFF / Disabled** (reset to default). When using the `Next.js` framework preset, Vercel natively inspects `.next` and automatically distributes the static pages.
+>
+> Alternatively, if you wish to deploy strictly as raw static HTML files without the Next.js builder, change **Framework Preset** to **`Other`**, keep **Build Command** as `pnpm run build`, and set **Output Directory** to `out`.
 
 ### Production Pairing:
 - **`apps/storefront`** is the real-world production storefront target that pairs with **`apps/backend`** (Medusa v2 engine with PostgreSQL 16 & Redis 7).
