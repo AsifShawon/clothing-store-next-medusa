@@ -182,4 +182,34 @@ test.describe("London Boy Floating Compact Navbar Suite", () => {
       }
     }
   })
+
+  test("5. Slow, incremental scroll triggers compact navbar deterministically without failure", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto("/bd")
+
+    const header = page.locator("header")
+    await expect(header).toBeVisible()
+    await expect(header).toHaveAttribute("data-compact", "false")
+
+    // Simulate slow, continuous mouse wheel / trackpad scroll in small 2-3px increments
+    for (let i = 0; i < 70; i++) {
+      await page.evaluate(() => window.scrollBy(0, 3))
+      await page.waitForTimeout(16)
+    }
+
+    // Must deterministically enter compact state
+    await expect(header).toHaveAttribute("data-compact", "true")
+    await expect(header).toBeVisible()
+
+    // Scroll back slowly in small increments to page top
+    for (let i = 0; i < 70; i++) {
+      await page.evaluate(() => window.scrollBy(0, -3))
+      await page.waitForTimeout(16)
+    }
+
+    // Must return to expanded state
+    await expect(header).toHaveAttribute("data-compact", "false")
+  })
 })

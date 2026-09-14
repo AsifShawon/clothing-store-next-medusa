@@ -165,34 +165,61 @@ describe("Shared Mega Navigation IA & Interaction Suite", () => {
     assert.equal(accessibleLabels.home, "London Boy Home")
   })
 
-  test("9. Scroll threshold hysteresis and sentinel calculation prevents layout shift", () => {
+  test("9. Scroll threshold hysteresis and sentinel calculation prevents layout shift across slow and fast scroll", () => {
     let isCompact = false
-    let measuredExpandedHeight = 128
+    let measuredExpandedShellHeight = 161
 
-    function handleScrollThreshold(boundingTop: number, isIntersecting: boolean) {
-      // Sentinel logic: scrolled past top when not intersecting and boundingTop < 0
-      const scrolledPast = !isIntersecting && boundingTop < 0
+    function handleScrollThreshold(
+      boundingTop: number,
+      isIntersecting: boolean,
+      rootTop: number = 24
+    ) {
+      // Sentinel logic: scrolled past when outside intersection and above or at root's effective top (+ 1 subpixel tolerance)
+      const scrolledPast = !isIntersecting && boundingTop <= rootTop + 1
       isCompact = scrolledPast
       return isCompact
     }
 
-    // At top of page: sentinel intersects
-    assert.equal(handleScrollThreshold(40, true), false)
+    // A. At top of page: sentinel intersects within root (expanded)
+    assert.equal(handleScrollThreshold(160, true, 24), false)
     assert.equal(isCompact, false)
 
-    // Scrolled past: sentinel is above viewport
-    assert.equal(handleScrollThreshold(-25, false), true)
+    // B. Slow scroll boundary: sentinel exits intersection at exactly the 24px root boundary
+    assert.equal(handleScrollThreshold(24, false, 24), true)
     assert.equal(isCompact, true)
 
-    // Placeholder maintains natural height to ensure 0 Cumulative Layout Shift (CLS)
-    const containerStyle = {
-      minHeight: isCompact && measuredExpandedHeight ? `${measuredExpandedHeight}px` : undefined,
-    }
-    assert.equal(containerStyle.minHeight, "128px")
+    // C. Slow scroll 1px past boundary (top = 23px): must deterministically stay compact
+    assert.equal(handleScrollThreshold(23, false, 24), true)
+    assert.equal(isCompact, true)
 
-    // Returned to top
-    assert.equal(handleScrollThreshold(10, true), false)
+    // D. Subpixel precision (e.g. high-DPI scaling top = 24.5px): must activate compact
+    assert.equal(handleScrollThreshold(24.5, false, 24), true)
+    assert.equal(isCompact, true)
+
+    // E. Fast scroll jump (e.g. top = -150px): must activate compact
+    assert.equal(handleScrollThreshold(-150, false, 24), true)
+    assert.equal(isCompact, true)
+
+    // F. Element below viewport (e.g. top = 900px, not intersecting): must NOT activate compact
+    assert.equal(handleScrollThreshold(900, false, 24), false)
     assert.equal(isCompact, false)
+
+    // G. Return to top: sentinel enters root margin (isIntersecting = true)
+    assert.equal(handleScrollThreshold(25, true, 24), false)
+    assert.equal(isCompact, false)
+
+    // H. Placeholder maintains full expanded shell height (161px) to guarantee 0 Cumulative Layout Shift (CLS)
+    const containerStyle = {
+      minHeight: isCompact && measuredExpandedShellHeight ? `${measuredExpandedShellHeight}px` : undefined,
+    }
+    assert.equal(containerStyle.minHeight, undefined)
+
+    // Activate compact mode and verify wrapper reserves full shell height
+    handleScrollThreshold(23, false, 24)
+    const compactContainerStyle = {
+      minHeight: isCompact && measuredExpandedShellHeight ? `${measuredExpandedShellHeight}px` : undefined,
+    }
+    assert.equal(compactContainerStyle.minHeight, "161px")
   })
 })
 

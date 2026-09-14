@@ -61,12 +61,33 @@ export function Header({
   const [expandedHeight, setExpandedHeight] = useState<number>(128)
   const [headerBottom, setHeaderBottom] = useState<number>(160)
 
-  // Measure expanded header height to prevent Cumulative Layout Shift (CLS)
+  const onCompactChangeRef = useRef(onCompactChange)
   useEffect(() => {
-    if (!isCompact && headerRef.current) {
-      const height = headerRef.current.offsetHeight
+    onCompactChangeRef.current = onCompactChange
+  }, [onCompactChange])
+
+  // Measure expanded header shell height to prevent Cumulative Layout Shift (CLS)
+  useEffect(() => {
+    if (isCompact) return
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+
+    const updateHeight = () => {
+      const height = wrapper.getBoundingClientRect().height
       if (height > 50) {
         setExpandedHeight(height)
+      }
+    }
+
+    updateHeight()
+
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(() => {
+        updateHeight()
+      })
+      ro.observe(wrapper)
+      return () => {
+        ro.disconnect()
       }
     }
   }, [isCompact])
@@ -91,13 +112,50 @@ export function Header({
   useEffect(() => {
     if (isControlled) return
     const sentinel = sentinelRef.current
-    if (!sentinel || typeof IntersectionObserver === "undefined") return
+
+    // Graceful fallback for environments lacking IntersectionObserver
+    if (typeof IntersectionObserver === "undefined") {
+      let rafId: number | null = null
+      const handleScroll = () => {
+        if (rafId !== null) return
+        rafId = window.requestAnimationFrame(() => {
+          rafId = null
+          const el = sentinelRef.current
+          if (!el) return
+          const rect = el.getBoundingClientRect()
+          const scrolledPast = rect.top <= 24
+          setInternalIsCompact((prev) => {
+            if (prev !== scrolledPast) {
+              onCompactChangeRef.current?.(scrolledPast)
+              return scrolledPast
+            }
+            return prev
+          })
+        })
+      }
+      handleScroll()
+      window.addEventListener("scroll", handleScroll, { passive: true })
+      return () => {
+        if (rafId !== null) window.cancelAnimationFrame(rafId)
+        window.removeEventListener("scroll", handleScroll)
+      }
+    }
+
+    if (!sentinel) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0
-        setInternalIsCompact(scrolledPast)
-        onCompactChange?.(scrolledPast)
+        if (!entry) return
+        const effectiveRootTop = entry.rootBounds ? entry.rootBounds.top : 24
+        // Sentinel has scrolled past when outside intersection and above or at the root's top boundary
+        const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top <= effectiveRootTop + 1
+        setInternalIsCompact((prev) => {
+          if (prev !== scrolledPast) {
+            onCompactChangeRef.current?.(scrolledPast)
+            return scrolledPast
+          }
+          return prev
+        })
       },
       {
         root: null,
@@ -110,7 +168,7 @@ export function Header({
     return () => {
       observer.disconnect()
     }
-  }, [isControlled, onCompactChange])
+  }, [isControlled])
 
   return (
     <div
