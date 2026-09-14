@@ -5,7 +5,6 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
-import AnnouncementBar from "@modules/layout/components/announcement-bar"
 import NavHeader from "@modules/layout/components/nav-header"
 
 export default async function Nav() {
@@ -16,8 +15,7 @@ export default async function Nav() {
   ])
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 shadow-sm">
-      <AnnouncementBar />
+    <div className="relative w-full z-40">
       <NavHeader
         regions={regions}
         locales={locales}

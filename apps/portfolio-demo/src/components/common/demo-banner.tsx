@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import clsx from "clsx"
 import { ResetDemoModal } from "./reset-demo-modal"
 import { ArrowPath, BuildingStorefront, CogSixTooth } from "@medusajs/icons"
 
@@ -13,7 +14,12 @@ export function DemoBanner() {
 
   return (
     <>
-      <div className="bg-brand-primary text-white border-b border-brand-accent/30 text-xs py-2 px-4 sticky top-0 z-40">
+      <div
+        className={clsx(
+          "bg-brand-primary text-white border-b border-brand-accent/30 text-xs py-2 px-4 transition-all duration-200",
+          isAdmin ? "sticky top-0 z-40" : "relative z-30"
+        )}
+      >
         <div className="content-container flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

@@ -40,7 +40,7 @@ export default function NavHeader({
         mobileMenuSlot={<SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />}
         headerActionsSlot={
           <div className="hidden sm:flex items-center text-[11px] font-heading font-semibold uppercase tracking-wider text-brand-primary/80 bg-brand-secondary/80 border border-brand-border px-3 py-1 rounded-full">
-            <span>🇧🇩 BDT (৳)</span>
+            <span>BDT (৳)</span>
           </div>
         }
       />

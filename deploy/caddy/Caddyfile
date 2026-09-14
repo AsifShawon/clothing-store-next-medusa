@@ -1,0 +1,65 @@
+# ==============================================================================
+# PRODUCTION CADDY REVERSE PROXY CONFIGURATION
+# Handles TLS automation, HTTP/2 & HTTP/3, security headers, and reverse proxying.
+# ==============================================================================
+
+{
+    email admin@londonboy.co.uk
+    admin off
+}
+
+# ------------------------------------------------------------------------------
+# Storefront (Customer Facing: https://londonboy.co.uk)
+# ------------------------------------------------------------------------------
+londonboy.co.uk, www.londonboy.co.uk {
+    encode gzip zstd
+
+    # Security Headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        -Server
+    }
+
+    # Static Asset Caching
+    @static {
+        path /_next/static/*
+        path /favicon.ico
+        path /images/*
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    reverse_proxy storefront:8000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+
+# ------------------------------------------------------------------------------
+# Medusa Backend & Admin API (https://api.londonboy.co.uk)
+# ------------------------------------------------------------------------------
+api.londonboy.co.uk {
+    encode gzip zstd
+
+    # Security Headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    # Reverse proxy to Medusa v2 backend
+    reverse_proxy backend:9000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}

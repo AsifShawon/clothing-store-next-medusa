@@ -11,13 +11,6 @@ import {
   deduplicateFooterLinks,
 } from "./footer-model"
 
-export type { FooterLinkItem }
-export {
-  DEFAULT_CATEGORIES,
-  DEFAULT_COLLECTIONS,
-  DEFAULT_CUSTOMER_CARE,
-  deduplicateFooterLinks,
-}
 
 export interface FooterProps {
   homeHref?: string

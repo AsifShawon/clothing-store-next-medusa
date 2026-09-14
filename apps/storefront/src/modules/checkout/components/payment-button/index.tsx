@@ -198,7 +198,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
     <div className="space-y-3">
       <div className="p-3 bg-brand-secondary/80 border border-brand-border text-[11px] text-brand-primary/80">
         <span className="font-heading font-bold uppercase tracking-wider text-brand-accent block mb-0.5">
-          ⚙️ Development Test Mode
+          Development Test Mode
         </span>
         This order will be created using Medusa&apos;s development test provider. No real credit card charge will be made.
       </div>

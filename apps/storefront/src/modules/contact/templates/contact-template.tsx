@@ -55,7 +55,7 @@ export default function ContactTemplate() {
             <div className="space-y-4 text-xs">
               <div className="p-4 bg-brand-secondary/40 border border-brand-border space-y-1">
                 <span className="font-heading font-bold uppercase tracking-wider text-brand-primary block">
-                  ✉️ Email Support
+                  Email Support
                 </span>
                 <a
                   href="mailto:londonboy@mack.com.bd"
@@ -68,7 +68,7 @@ export default function ContactTemplate() {
 
               <div className="p-4 bg-brand-secondary/40 border border-brand-border space-y-1">
                 <span className="font-heading font-bold uppercase tracking-wider text-brand-primary block">
-                  📍 Dhaka Atelier &amp; Dispatch
+                  Dhaka Atelier &amp; Dispatch
                 </span>
                 <p className="text-brand-primary/80">Tejgaon Industrial Area, Dhaka, Bangladesh</p>
                 <p className="text-brand-primary/60 text-[11px]">Central Warehouse &amp; Fulfillment</p>
@@ -76,7 +76,7 @@ export default function ContactTemplate() {
 
               <div className="p-4 bg-brand-secondary/40 border border-brand-border space-y-1">
                 <span className="font-heading font-bold uppercase tracking-wider text-brand-primary block">
-                  🕒 Operating Hours
+                  Operating Hours
                 </span>
                 <p className="text-brand-primary/80">Saturday – Thursday: 10:00 AM – 8:00 PM</p>
                 <p className="text-brand-primary/60 text-[11px]">Friday: Closed for weekly dispatch</p>
@@ -119,7 +119,9 @@ export default function ContactTemplate() {
 
             {submitted ? (
               <div className="p-8 bg-brand-secondary border border-brand-accent/40 text-center space-y-3 animate-fade-in-top" role="alert">
-                <span className="text-3xl">✉️</span>
+                <svg className="w-8 h-8 mx-auto text-brand-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
                 <h4 className="font-heading font-bold text-sm uppercase tracking-wider text-brand-primary">
                   Thank You, {formData.name}
                 </h4>

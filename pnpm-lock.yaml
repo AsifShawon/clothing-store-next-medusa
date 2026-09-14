@@ -230,9 +230,6 @@ importers:
       next:
         specifier: 15.5.21
         version: 15.5.21(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.62.1)(react-dom@19.0.5(react@19.0.5))(react@19.0.5)
-      pg:
-        specifier: ^8.11.3
-        version: 8.23.0
       qs:
         specifier: ^6.12.1
         version: 6.15.3
@@ -251,22 +248,25 @@ importers:
       tailwindcss-radix:
         specifier: ^2.8.0
         version: 2.9.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
     devDependencies:
       '@babel/core':
         specifier: ^7.17.5
         version: 7.29.7
       '@medusajs/types':
         specifier: 2.19.0
-        version: 2.19.0(ioredis@5.11.1)(vite@7.3.6(@types/node@17.0.21)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0))
+        version: 2.19.0(ioredis@5.11.1)(vite@7.3.6(@types/node@20.19.43)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0))
+      '@playwright/test':
+        specifier: ^1.62.1
+        version: 1.62.1
       '@types/lodash':
         specifier: ^4.14.195
         version: 4.17.25
       '@types/node':
-        specifier: 17.0.21
-        version: 17.0.21
-      '@types/pg':
-        specifier: ^8.11.0
-        version: 8.23.1
+        specifier: ^20.19.0
+        version: 20.19.43
       '@types/react':
         specifier: 19.0.5
         version: 19.0.5
@@ -3793,9 +3793,6 @@ packages:
 
   '@types/mute-stream@0.0.4':
     resolution: {integrity: sha512-CPM9nzrCPPJHQNA9keH9CVkVI+WR5kMa+7XEs5jcGQ0VoAGnLv242w8lIVgwAEfmE4oufJRaTc9PNLQl0ioAow==}
-
-  '@types/node@17.0.21':
-    resolution: {integrity: sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==}
 
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
@@ -8142,6 +8139,9 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
   zod@4.2.0:
     resolution: {integrity: sha512-Bd5fw9wlIhtqCCxotZgdTOMwGm1a0u75wARVEY9HMs1X17trvA/lMi4+MGK5EUfYkXVTbX8UDiDKW4OgzHVUZw==}
 
@@ -10306,13 +10306,6 @@ snapshots:
     dependencies:
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@20.19.43))(@types/node@20.19.43)(ioredis@5.11.1)(vite@7.3.6(@types/node@20.19.43)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0))(zod@4.2.0)
 
-  '@medusajs/types@2.19.0(ioredis@5.11.1)(vite@7.3.6(@types/node@17.0.21)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0))':
-    dependencies:
-      bignumber.js: 9.3.1
-    optionalDependencies:
-      ioredis: 5.11.1
-      vite: 7.3.6(@types/node@17.0.21)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0)
-
   '@medusajs/types@2.19.0(ioredis@5.11.1)(vite@7.3.6(@types/node@20.19.43)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0))':
     dependencies:
       bignumber.js: 9.3.1
@@ -12371,8 +12364,6 @@ snapshots:
   '@types/mute-stream@0.0.4':
     dependencies:
       '@types/node': 20.19.43
-
-  '@types/node@17.0.21': {}
 
   '@types/node@20.19.43':
     dependencies:
@@ -17371,22 +17362,6 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.3.6(@types/node@17.0.21)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0):
-    dependencies:
-      esbuild: 0.28.2
-      fdir: 6.5.0(picomatch@4.0.7)
-      picomatch: 4.0.7
-      postcss: 8.5.26
-      rollup: 4.63.0
-      tinyglobby: 0.2.17
-    optionalDependencies:
-      '@types/node': 17.0.21
-      fsevents: 2.3.3
-      jiti: 2.7.0
-      terser: 5.51.0
-      yaml: 2.9.0
-    optional: true
-
   vite@7.3.6(@types/node@20.19.43)(jiti@2.7.0)(terser@5.51.0)(yaml@2.9.0):
     dependencies:
       esbuild: 0.28.2
@@ -17652,5 +17627,7 @@ snapshots:
   zod-validation-error@5.0.0(zod@4.2.0):
     dependencies:
       zod: 4.2.0
+
+  zod@3.25.76: {}
 
   zod@4.2.0: {}

@@ -13,7 +13,7 @@ const headers = {
 describe("Medusa Cart and Checkout Flow", () => {
   let bdRegion: { id: string; name: string }
   let targetVariant: { id: string; sku: string; title: string }
-  let tshirtProduct: { id: string; title: string }
+  let tshirtProduct: { id: string; title: string; variants: { id: string; sku: string; title: string }[] }
   let adminToken: string
   let cartId: string
   let lineItemId: string

@@ -15,21 +15,21 @@ const Help = () => {
           href="/contact"
           className="text-xs font-semibold text-brand-accent hover:underline flex items-center gap-1"
         >
-          <span>✉️ Contact Customer Care</span>
+          <span>Contact Customer Care</span>
         </LocalizedClientLink>
         <span className="text-brand-muted">•</span>
         <LocalizedClientLink
           href="/return-policy"
           className="text-xs font-semibold text-brand-primary hover:underline flex items-center gap-1"
         >
-          <span>🛡️ 24-Hour Return Policy</span>
+          <span>24-Hour Return Policy</span>
         </LocalizedClientLink>
         <span className="text-brand-muted">•</span>
         <LocalizedClientLink
           href="/shipping-policy"
           className="text-xs font-semibold text-brand-primary hover:underline flex items-center gap-1"
         >
-          <span>🚚 Delivery Information</span>
+          <span>Delivery Information</span>
         </LocalizedClientLink>
       </div>
     </div>

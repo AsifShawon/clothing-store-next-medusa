@@ -159,8 +159,9 @@ export default function FAQTemplate() {
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-3 top-3 text-xs text-brand-muted hover:text-brand-primary"
+                  aria-label="Clear search"
                 >
-                  ✕
+                  &times;
                 </button>
               )}
             </div>
@@ -190,9 +191,9 @@ export default function FAQTemplate() {
         {/* Review Notice */}
         <div className="p-4 bg-brand-secondary/60 border border-brand-border text-[11px] text-brand-primary/70">
           <span className="font-bold text-brand-primary uppercase block">
-            ⚠️ Policy Callout Notice
+            Policy Notice
           </span>
-          [REVIEW REQUIRED: Business-owner / Legal Counsel confirmation needed for exact delivery rates (৳60/৳100/৳130) and 24h return window policy specifics.]
+          [Review Note: Delivery rates (৳60/৳100/৳130) and 24h return window policy specifics.]
         </div>
 
         {/* FAQ Accordion */}

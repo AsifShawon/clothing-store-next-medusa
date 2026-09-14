@@ -1,0 +1,174 @@
+# ==============================================================================
+# PRODUCTION DOCKER COMPOSE ORCHESTRATION
+# Enterprise-ready single-brand DTC infrastructure:
+# - Private internal network (Database & Redis are NEVER exposed to the public Internet)
+# - Health-checked service dependency graph
+# - Non-root container security
+# - Explicit database migration release workflow (do not run migrations on every replica)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL 16 Enterprise Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: medusa-prod-postgres
+    restart: unless-stopped
+    networks:
+      - medusa_internal
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medusa_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password must be provided}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa_prod}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medusa_user} -d ${POSTGRES_DB:-medusa_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Note: Ports are NOT exposed to the host for production security.
+
+  # ----------------------------------------------------------------------------
+  # 2. Redis 7 Cache & Event Bus
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: medusa-prod-redis
+    restart: unless-stopped
+    networks:
+      - medusa_internal
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?Redis password must be provided}"]
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    # Note: Ports are NOT exposed to the host for production security.
+
+  # ----------------------------------------------------------------------------
+  # 3. Medusa v2 Backend API & Admin Service
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: medusa-prod-backend
+    restart: unless-stopped
+    networks:
+      - medusa_internal
+      - medusa_public
+    ports:
+      - "127.0.0.1:9000:9000"
+    environment:
+      NODE_ENV: production
+      PORT: 9000
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-medusa_prod}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be supplied}
+      COOKIE_SECRET: ${COOKIE_SECRET:?COOKIE_SECRET must be supplied}
+      STORE_CORS: ${STORE_CORS:?STORE_CORS must be supplied}
+      ADMIN_CORS: ${ADMIN_CORS:?ADMIN_CORS must be supplied}
+      AUTH_CORS: ${AUTH_CORS:?AUTH_CORS must be supplied}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:?MEDUSA_BACKEND_URL must be supplied}
+      STOREFRONT_URL: ${STOREFRONT_URL:?STOREFRONT_URL must be supplied}
+      S3_URL: ${S3_URL:?S3_URL must be supplied}
+      S3_BUCKET: ${S3_BUCKET:?S3_BUCKET must be supplied}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?S3_ACCESS_KEY_ID must be supplied}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:?S3_SECRET_ACCESS_KEY must be supplied}
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_CAPTURE: ${STRIPE_CAPTURE:-true}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-London Boy <orders@send.londonboy.co.uk>}
+      RESEND_REPLY_TO: ${RESEND_REPLY_TO:-support@londonboy.co.uk}
+      DISABLE_EMAIL_NOTIFICATIONS: ${DISABLE_EMAIL_NOTIFICATIONS:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then((r)=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ----------------------------------------------------------------------------
+  # 4. Next.js 15 Storefront
+  # ----------------------------------------------------------------------------
+  storefront:
+    build:
+      context: .
+      dockerfile: apps/storefront/Dockerfile
+      args:
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:?NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY must be supplied}
+    container_name: medusa-prod-storefront
+    restart: unless-stopped
+    networks:
+      - medusa_internal
+      - medusa_public
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:?MEDUSA_BACKEND_URL must be supplied}
+      NEXT_PUBLIC_BASE_URL: ${STOREFRONT_URL:?STOREFRONT_URL must be supplied}
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:?NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY must be supplied}
+      NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-bd}
+      NEXT_PUBLIC_STRIPE_KEY: ${NEXT_PUBLIC_STRIPE_KEY}
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8000').then((r)=>{if(r.status>=500)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ----------------------------------------------------------------------------
+  # 5. Reverse Proxy with Automated TLS (Caddy)
+  # ----------------------------------------------------------------------------
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: medusa-prod-proxy
+    restart: unless-stopped
+    networks:
+      - medusa_public
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - storefront
+
+networks:
+  medusa_internal:
+    driver: bridge
+    internal: true
+  medusa_public:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+    name: medusa_prod_postgres_data
+  redis_prod_data:
+    name: medusa_prod_redis_data
+  caddy_data:
+    name: medusa_prod_caddy_data
+  caddy_config:
+    name: medusa_prod_caddy_config

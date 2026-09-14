@@ -36,7 +36,9 @@ export default function NewsletterSection() {
 
         {submitted ? (
           <div className="p-6 bg-white/10 border border-brand-accent/40 text-center space-y-2 animate-fade-in-top">
-            <span className="text-2xl">✨</span>
+            <svg className="w-6 h-6 mx-auto text-brand-accent" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z" />
+            </svg>
             <h4 className="font-heading font-bold text-sm text-white uppercase tracking-wider">
               Welcome to the Circle
             </h4>

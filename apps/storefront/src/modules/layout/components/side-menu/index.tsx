@@ -25,7 +25,7 @@ const SideMenu = ({ regions }: SideMenuProps) => {
           <>
             <Popover.Button
               data-testid="nav-menu-button"
-              className="flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-brand-primary hover:text-brand-accent transition-colors p-2 focus:outline-none"
+              className="flex items-center justify-center gap-2 text-xs font-semibold tracking-wider uppercase text-brand-primary hover:text-brand-accent transition-colors p-2 min-w-[44px] min-h-[44px] focus:outline-none"
               aria-label="Open mobile navigation menu"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,10 +62,10 @@ const SideMenu = ({ regions }: SideMenuProps) => {
                   <button
                     data-testid="close-menu-button"
                     onClick={close}
-                    className="p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                    className="p-2 text-white/70 hover:text-white hover:bg-white/10 transition-colors text-base"
                     aria-label="Close menu"
                   >
-                    ✕
+                    &times;
                   </button>
                 </div>
 
@@ -101,7 +101,7 @@ const SideMenu = ({ regions }: SideMenuProps) => {
                           onClick={close}
                           className="hover:text-brand-accent transition-colors block py-1"
                         >
-                          ✨ New Arrivals
+                          New Arrivals
                         </LocalizedClientLink>
                       </li>
                       <li>
@@ -110,7 +110,7 @@ const SideMenu = ({ regions }: SideMenuProps) => {
                           onClick={close}
                           className="hover:text-brand-accent transition-colors block py-1"
                         >
-                          🔥 Best Sellers
+                          Best Sellers
                         </LocalizedClientLink>
                       </li>
                       <li>
@@ -119,7 +119,7 @@ const SideMenu = ({ regions }: SideMenuProps) => {
                           onClick={close}
                           className="hover:text-brand-accent transition-colors block py-1"
                         >
-                          👔 The Essentials
+                          The Essentials
                         </LocalizedClientLink>
                       </li>
                     </ul>

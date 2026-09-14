@@ -1,26 +1,27 @@
 {
   "name": "@dtc/backend",
-  "version": "0.0.1",
-  "description": "A starter for Medusa projects.",
-  "author": "Medusa (https://medusajs.com)",
+  "version": "1.0.0",
+  "description": "London Boy DTC Clothing Store Medusa v2 Backend",
+  "author": "London Boy DTC Team",
   "license": "MIT",
   "keywords": [
-    "sqlite",
     "postgres",
+    "redis",
     "typescript",
     "ecommerce",
-    "headless",
-    "medusa"
+    "medusa",
+    "london-boy"
   ],
   "scripts": {
     "build": "medusa build",
     "start": "medusa start",
     "dev": "medusa develop",
     "lint": "medusa lint",
+    "type-check": "tsc --noEmit",
     "seed": "medusa exec ./src/migration-scripts/initial-data-seed.ts",
-    "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
-    "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
-    "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit"
+    "test:integration:http": "node -e \"process.env.TEST_TYPE='integration:http'; require('jest').run(['--silent=false', '--runInBand', '--forceExit'])\"",
+    "test:integration:modules": "node -e \"process.env.TEST_TYPE='integration:modules'; require('jest').run(['--silent=false', '--runInBand', '--forceExit'])\"",
+    "test:unit": "node -e \"process.env.TEST_TYPE='unit'; require('jest').run(['--silent', '--runInBand', '--forceExit'])\""
   },
   "dependencies": {
     "@medusajs/admin-sdk": "2.19.0",

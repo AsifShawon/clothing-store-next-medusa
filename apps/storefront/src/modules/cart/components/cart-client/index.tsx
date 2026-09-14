@@ -25,28 +25,53 @@ export default function MedusaCartClient({ cart }: MedusaCartClientProps) {
   const routes = createMedusaRoutes(countryCode)
 
   const [promoError, setPromoError] = useState<string | undefined>()
+  const [cartError, setCartError] = useState<string | null>(null)
+  const [activeMutationId, setActiveMutationId] = useState<string | null>(null)
 
   const handleUpdateQuantity = async (lineId: string, quantity: number) => {
+    if (activeMutationId) {
+      return
+    }
+
+    setActiveMutationId(lineId)
+    setCartError(null)
+
     try {
       await updateLineItem({ lineId, quantity })
       router.refresh()
     } catch (error: unknown) {
-      console.error("Error updating quantity:", getErrorMessage(error))
+      const msg = getErrorMessage(error)
+      setCartError(`Unable to update quantity: ${msg}`)
+      console.error("Error updating quantity:", msg)
+    } finally {
+      setActiveMutationId(null)
     }
   }
 
   const handleRemoveItem = async (lineId: string) => {
+    if (activeMutationId) {
+      return
+    }
+
+    setActiveMutationId(lineId)
+    setCartError(null)
+
     try {
       await deleteLineItem(lineId)
       router.refresh()
     } catch (error: unknown) {
-      console.error("Error removing item:", getErrorMessage(error))
+      const msg = getErrorMessage(error)
+      setCartError(`Unable to remove item: ${msg}`)
+      console.error("Error removing item:", msg)
+    } finally {
+      setActiveMutationId(null)
     }
   }
 
   const handleApplyPromoCode = async (code: string) => {
     try {
       setPromoError(undefined)
+      setCartError(null)
       await applyPromotions([code])
       router.refresh()
       return true
@@ -70,15 +95,34 @@ export default function MedusaCartClient({ cart }: MedusaCartClientProps) {
   }
 
   return (
-    <CartView
-      cart={resolvedCart}
-      onUpdateQuantity={handleUpdateQuantity}
-      onRemoveItem={handleRemoveItem}
-      onApplyPromoCode={handleApplyPromoCode}
-      promoError={promoError}
-      routes={routes}
-      capabilities={DEFAULT_MEDUSA_CAPABILITIES}
-      linkComponent={LocalizedClientLink}
-    />
+    <div>
+      {cartError && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 p-3 bg-red-50 border border-red-200 text-xs text-red-700 flex items-center justify-between"
+        >
+          <span>{cartError}</span>
+          <button
+            type="button"
+            onClick={() => setCartError(null)}
+            className="text-red-500 hover:text-red-800 font-bold ml-2"
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <CartView
+        cart={resolvedCart}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onApplyPromoCode={handleApplyPromoCode}
+        promoError={promoError}
+        routes={routes}
+        capabilities={DEFAULT_MEDUSA_CAPABILITIES}
+        linkComponent={LocalizedClientLink}
+      />
+    </div>
   )
 }

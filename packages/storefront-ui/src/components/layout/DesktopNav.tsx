@@ -20,6 +20,7 @@ export interface DesktopNavProps {
   activeMenuId?: string | null
   onMenuChange?: (id: string | null) => void
   backdropTop?: number
+  isCompact?: boolean
 }
 
 export function DesktopNav({
@@ -29,6 +30,7 @@ export function DesktopNav({
   activeMenuId: controlledActiveId,
   onMenuChange,
   backdropTop,
+  isCompact = false,
 }: DesktopNavProps) {
   const [internalActiveId, setInternalActiveId] = useState<string | null>(null)
   const isControlled = controlledActiveId !== undefined
@@ -165,7 +167,12 @@ export function DesktopNav({
       <>
         <nav
           aria-label="Main category navigation"
-          className="hidden lg:flex items-center h-full gap-x-6 xl:gap-x-8 text-xs font-heading font-semibold uppercase tracking-wider"
+          className={clsx(
+            "hidden lg:flex items-center h-full font-heading font-semibold uppercase tracking-wider",
+            isCompact
+              ? "gap-x-2 xl:gap-x-4 2xl:gap-x-6 text-[11px] xl:text-xs"
+              : "gap-x-6 xl:gap-x-8 text-xs"
+          )}
         >
           {items.map((item) => {
             const isMenuOpen = activeId === item.id
@@ -188,7 +195,7 @@ export function DesktopNav({
                   aria-controls={`mega-menu-panel-${item.id}`}
                   aria-haspopup="true"
                   className={clsx(
-                    "h-full flex items-center px-1 border-b-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
+                    "h-full flex items-center px-1 whitespace-nowrap border-b-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent",
                     isMenuOpen
                       ? "text-brand-accent border-brand-accent"
                       : item.isActive
@@ -222,6 +229,7 @@ export function DesktopNav({
             onMouseEnter={handlePanelMouseEnter}
             onMouseLeave={handlePanelMouseLeave}
             linkComponent={LinkComp}
+            isCompact={isCompact}
           />
         )}
       </>
@@ -231,13 +239,19 @@ export function DesktopNav({
   // Backward-compatible fallback if only flat `links` provided
   const navLinks = links || []
   return (
-    <nav className="hidden lg:flex items-center h-full gap-x-7 text-xs font-semibold uppercase tracking-wider text-brand-primary">
+    <nav
+      aria-label="Main category navigation"
+      className={clsx(
+        "hidden lg:flex items-center h-full uppercase tracking-wider text-brand-primary",
+        isCompact ? "gap-x-3 xl:gap-x-5 text-[11px] xl:text-xs" : "gap-x-7 text-xs font-semibold"
+      )}
+    >
       {navLinks.map((link, idx) => (
         <LinkComp
           key={`${link.label}-${link.href}-${idx}`}
           href={link.href}
           className={clsx(
-            "h-full flex items-center px-1 transition-colors duration-150 border-b-2 hover:text-brand-accent hover:border-brand-accent",
+            "h-full flex items-center px-1 whitespace-nowrap transition-colors duration-150 border-b-2 hover:text-brand-accent hover:border-brand-accent",
             link.isActive
               ? "text-brand-accent border-brand-accent font-bold"
               : "text-brand-primary border-transparent"

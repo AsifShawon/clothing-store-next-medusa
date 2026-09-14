@@ -43,9 +43,14 @@ export function AnnouncementBar({
         <div className="hidden md:flex items-center gap-x-6 text-[11px] font-medium tracking-wide">
           {leftHighlights || (
             <>
-              <span>🇬🇧 British-Inspired Smart-Casual</span>
+              <span>British-Inspired Smart-Casual</span>
               <span className="text-brand-muted/40">•</span>
-              <span>⚡ 24–48h Delivery Inside Dhaka</span>
+              <span className="inline-flex items-center gap-1">
+                <svg className="w-3 h-3 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>24–48h Delivery Inside Dhaka</span>
+              </span>
             </>
           )}
         </div>

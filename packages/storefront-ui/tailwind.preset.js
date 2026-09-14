@@ -10,6 +10,9 @@ module.exports = {
         visibility: "visibility",
         padding: "padding-top padding-right padding-bottom padding-left",
       },
+      transitionTimingFunction: {
+        luxury: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
       colors: {
         brand: {
           primary: "#111111",
@@ -126,6 +129,10 @@ module.exports = {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        "floating-nav": {
+          "0%": { transform: "translateY(-6px)", opacity: "0.95" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
@@ -136,6 +143,7 @@ module.exports = {
         "accordion-close": "accordion-slide-up 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards",
         enter: "enter 200ms ease-out",
         "slide-in": "slide-in 1.2s cubic-bezier(.41,.73,.51,1.02)",
+        "floating-nav": "floating-nav 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards",
         leave: "leave 150ms ease-in forwards",
       },
     },

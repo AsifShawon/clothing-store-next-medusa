@@ -424,67 +424,40 @@ To transition the store to commercial production:
 2. Provision managed PostgreSQL 16 and Redis 7 instances.
 3. Configure live Stripe API keys and register the webhook endpoint (`/store/stripe/hooks`).
 4. Attach an S3-compatible cloud bucket (AWS S3 or Cloudflare R2) for product photography.
-5. Enable Resend or SendGrid API keys for transactional order confirmation emails.
-6. Deploy containerized services via Docker Compose behind a Caddy reverse proxy with automated SSL certificate renewal.
 
----
+## Production Deployment & Infrastructure
 
-## Future Real-Production Deployment Path
+The real production track provides hardened, containerized orchestration:
 
-For real-world deployment, the production stack is packaged with Docker Compose:
+- **Multi-stage Dockerfiles**:
+  - `apps/backend/Dockerfile`: Production Medusa v2 backend image (Node 20 Alpine, non-root user `node`, frozen pnpm lockfile, health checks).
+  - `apps/storefront/Dockerfile`: Next.js 15 standalone production image (minimal runtime footprint, non-root user `node`, health checks).
+- **Docker Compose Profiles**:
+  - `docker-compose.dev.yml`: Local PostgreSQL 16 and Redis 7 development database and cache.
+  - `docker-compose.prod.yml`: Production orchestration featuring internal-only networks for database and cache, health checks, dependency sequencing, and Caddy reverse proxy with automated TLS.
+- **Reverse Proxy Configurations**:
+  - `deploy/caddy/Caddyfile`: Automated TLS, HTTP/2 & HTTP/3, and reverse proxying for `londonboy.co.uk` and `api.londonboy.co.uk`.
+  - `deploy/nginx/nginx.conf`: Nginx alternative with rate limiting, SSL termination, and security headers.
+- **Production Operations Runbook**:
+  - Comprehensive operational guidelines, migration release workflows, backup/restore procedures, and troubleshooting can be found in [docs/PRODUCTION_RUNBOOK.md](docs/PRODUCTION_RUNBOOK.md).
 
-```yaml
-version: "3.8"
+### Quick Deployment Commands
 
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: medusa_dtc
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+```bash
+# 1. Start local dev dependencies (PostgreSQL 16 & Redis 7)
+docker compose -f docker-compose.dev.yml up -d
 
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
+# 2. Run database migrations as an explicit release step
+docker compose -f docker-compose.prod.yml run --rm backend pnpm exec medusa db:migrate
 
-  backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:${DB_PASSWORD}@postgres:5432/medusa_dtc
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      COOKIE_SECRET: ${COOKIE_SECRET}
-      STRIPE_API_KEY: ${STRIPE_API_KEY}
-    depends_on:
-      - postgres
-      - redis
-    restart: unless-stopped
-
-  storefront:
-    build:
-      context: .
-      dockerfile: apps/storefront/Dockerfile
-    environment:
-      NEXT_PUBLIC_MEDUSA_BACKEND_URL: https://api.londonboy.co.uk
-      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY}
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-volumes:
-  pgdata:
+# 3. Launch full production stack with health checks
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Production Infrastructure Checklist:
-1. **Reverse Proxy & SSL**: Configure Caddy or Nginx with automatic Let's Encrypt certificates for `londonboy.co.uk` and `api.londonboy.co.uk`.
+1. **Reverse Proxy & Automated TLS**: Automated Let's Encrypt certificates via Caddy or Nginx for `londonboy.co.uk` and `api.londonboy.co.uk`.
 2. **Database Backups**: Automated daily PostgreSQL pg_dump backups to offsite cold storage.
-3. **Continuous Integration**: GitHub Actions CI workflow executing Medusa module integration suites (`pnpm run test:integration:modules`) and storefront build verification.
+3. **Continuous Integration**: GitHub Actions CI workflow executing Medusa unit/integration suites and storefront build verification.
 
 ---
 

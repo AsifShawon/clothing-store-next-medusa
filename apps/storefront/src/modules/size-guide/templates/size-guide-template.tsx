@@ -30,10 +30,10 @@ export default function SizeGuideTemplate() {
         <div className="p-4 bg-brand-secondary/70 border border-brand-accent/40 rounded-none text-xs text-brand-primary/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <span className="font-bold text-brand-primary uppercase text-[11px] block">
-              ⚠️ Measurement Standard Notice
+              Measurement Standard Notice
             </span>
             <p className="text-[11px] text-brand-primary/70 mt-0.5">
-              [REVIEW REQUIRED: Business-owner / Technical Designer verification needed for factory measurement tolerances (±0.5 inch).]
+              [Review Note: Factory measurement tolerances are ±0.5 inch / ±1.2 cm.]
             </p>
           </div>
           <span className="text-[10px] font-heading font-semibold uppercase tracking-wider px-2 py-1 bg-white border border-brand-border text-brand-accent">

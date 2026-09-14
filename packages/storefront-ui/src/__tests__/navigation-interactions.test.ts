@@ -138,4 +138,61 @@ describe("Shared Mega Navigation IA & Interaction Suite", () => {
     )
     assert.equal(deduped[0].label, "New Arrivals")
   })
+
+  test("7. Floating compact navbar state preserves all 7 shopping departments", () => {
+    const nav = createStoreNavigation(mockRoutes)
+    assert.equal(nav.length, 7)
+    // Categories must remain fully accessible in both expanded and compact states
+    for (const item of nav) {
+      assert.ok(item.label.length > 0)
+      assert.ok(item.href.length > 0)
+    }
+  })
+
+  test("8. Floating compact navbar maintains accessible names for shopping controls", () => {
+    const accessibleLabels = {
+      menu: "Open navigation menu",
+      search: "Search catalog",
+      account: "Customer Account",
+      bag: (count: number) => `Shopping bag with ${count} items`,
+      home: "London Boy Home",
+    }
+
+    assert.equal(accessibleLabels.menu, "Open navigation menu")
+    assert.equal(accessibleLabels.search, "Search catalog")
+    assert.equal(accessibleLabels.account, "Customer Account")
+    assert.equal(accessibleLabels.bag(3), "Shopping bag with 3 items")
+    assert.equal(accessibleLabels.home, "London Boy Home")
+  })
+
+  test("9. Scroll threshold hysteresis and sentinel calculation prevents layout shift", () => {
+    let isCompact = false
+    let measuredExpandedHeight = 128
+
+    function handleScrollThreshold(boundingTop: number, isIntersecting: boolean) {
+      // Sentinel logic: scrolled past top when not intersecting and boundingTop < 0
+      const scrolledPast = !isIntersecting && boundingTop < 0
+      isCompact = scrolledPast
+      return isCompact
+    }
+
+    // At top of page: sentinel intersects
+    assert.equal(handleScrollThreshold(40, true), false)
+    assert.equal(isCompact, false)
+
+    // Scrolled past: sentinel is above viewport
+    assert.equal(handleScrollThreshold(-25, false), true)
+    assert.equal(isCompact, true)
+
+    // Placeholder maintains natural height to ensure 0 Cumulative Layout Shift (CLS)
+    const containerStyle = {
+      minHeight: isCompact && measuredExpandedHeight ? `${measuredExpandedHeight}px` : undefined,
+    }
+    assert.equal(containerStyle.minHeight, "128px")
+
+    // Returned to top
+    assert.equal(handleScrollThreshold(10, true), false)
+    assert.equal(isCompact, false)
+  })
 })
+

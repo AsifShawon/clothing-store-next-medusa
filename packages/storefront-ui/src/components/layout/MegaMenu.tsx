@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import clsx from "clsx"
 import { MegaNavItem } from "./navigation-model"
 import { LinkComponent } from "../../types"
 import { ArrowRightIcon } from "../icons"
@@ -14,6 +15,7 @@ export interface MegaMenuProps {
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   linkComponent?: LinkComponent
+  isCompact?: boolean
 }
 
 export function MegaMenu({
@@ -23,6 +25,7 @@ export function MegaMenu({
   onMouseEnter,
   onMouseLeave,
   linkComponent: LinkComp = Link,
+  isCompact = false,
 }: MegaMenuProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -50,7 +53,12 @@ export function MegaMenu({
       ref={panelRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 right-0 z-40 bg-white border-b border-brand-border/80 shadow-mega animate-mega-enter before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']"
+      className={clsx(
+        "absolute left-0 right-0 z-40 bg-white shadow-mega animate-mega-enter before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:content-['']",
+        isCompact
+          ? "top-[calc(100%+8px)] rounded-2xl border border-brand-border/80 shadow-2xl overflow-hidden"
+          : "top-full border-b border-brand-border/80"
+      )}
     >
       <div className="content-container py-8 lg:py-10">
         <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">

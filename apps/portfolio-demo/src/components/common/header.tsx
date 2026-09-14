@@ -58,7 +58,7 @@ export function StorefrontHeader() {
         headerActionsSlot={
           <Link
             href="/demo-admin"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-heading font-semibold bg-brand-secondary hover:bg-brand-sand/40 text-brand-primary border border-brand-border transition-colors rounded-full uppercase tracking-wider"
+            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-heading font-semibold bg-brand-secondary hover:bg-brand-sand/40 text-brand-primary border border-brand-border transition-colors rounded-full uppercase tracking-wider whitespace-nowrap"
             title="Open Simulated Demo Admin Dashboard"
           >
             <BuildingStorefrontIcon className="w-3.5 h-3.5 text-brand-accent" />

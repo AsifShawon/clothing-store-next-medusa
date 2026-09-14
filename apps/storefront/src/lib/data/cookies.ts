@@ -19,34 +19,29 @@ export const getAuthHeaders = async (): Promise<
 }
 
 export const getCacheTag = async (tag: string): Promise<string> => {
-  try {
-    const cookies = await nextCookies()
-    const cacheId = cookies.get("_medusa_cache_id")?.value
-
-    if (!cacheId) {
-      return ""
+  if (tag === "carts") {
+    try {
+      const cookies = await nextCookies()
+      const cartId = cookies.get("_medusa_cart_id")?.value
+      if (cartId) {
+        return `cart-${cartId}`
+      }
+    } catch {
+      return "carts"
     }
-
-    return `${tag}-${cacheId}`
-  } catch {
-    return ""
   }
+  return tag
 }
 
 export const getCacheOptions = async (
   tag: string
-): Promise<{ tags: string[] } | Record<string, never>> => {
+): Promise<{ tags: string[] }> => {
   if (typeof window !== "undefined") {
-    return {}
+    return { tags: [] }
   }
 
   const cacheTag = await getCacheTag(tag)
-
-  if (!cacheTag) {
-    return {}
-  }
-
-  return { tags: [`${cacheTag}`] }
+  return { tags: [cacheTag] }
 }
 
 // `sameSite: "lax"` rather than `"strict"`: the customer returns from a

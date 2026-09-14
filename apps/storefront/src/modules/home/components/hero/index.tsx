@@ -12,7 +12,7 @@ const Hero = () => {
           {/* Left: Editorial Headline & Copy */}
           <div className="lg:col-span-7 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary text-white text-[11px] font-heading font-semibold uppercase tracking-widest">
-              <span>🇬🇧 British Smart-Casual</span>
+              <span>British Smart-Casual</span>
               <span className="text-brand-muted">•</span>
               <span>240 GSM Combed Cotton</span>
             </div>
@@ -44,15 +44,21 @@ const Hero = () => {
             {/* Micro Highlights */}
             <div className="pt-6 border-t border-brand-border/60 flex flex-wrap items-center gap-6 text-xs text-brand-primary/70">
               <div className="flex items-center gap-1.5 font-medium">
-                <span className="text-brand-accent">✓</span>
+                <svg className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
                 <span>Inside Dhaka ৳60 (24–48h)</span>
               </div>
               <div className="flex items-center gap-1.5 font-medium">
-                <span className="text-brand-accent">✓</span>
+                <svg className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
                 <span>24-Hour Return Guarantee</span>
               </div>
               <div className="flex items-center gap-1.5 font-medium">
-                <span className="text-brand-accent">✓</span>
+                <svg className="w-3.5 h-3.5 text-brand-accent flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
                 <span>Sizes S to XL / 30 to 36</span>
               </div>
             </div>
